@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 2019.06.27 성재민 -->
+<!-- 컴퍼니 관련 dao 처리 -->
+<mapper namespace="consultingDAO">
+
+	<!-- 2019.07.09 성재민 -->
+	<!-- 날짜 처리 를 문자열로 받아 TO_DATE로 변환하여 db에 전달 -->
+	<!-- 2019.07.08 성재민 -->
+	<!-- 비회원이 상담신청을 하는 경우 companyId 값이 없을 수도 있으므로 예외처리 -->
+	<!-- 2019.07.03 성재민 -->
+	<!-- 컨설팅 등록 sql -->
+	<insert id="insertConsulting" parameterType="ConsultingVO">
+		INSERT INTO CONSULTING(
+			CONSULTING_ID
+			,CONSULTING_CONTENTS
+			,CONSULTING_DESIRED_DATE
+			,CONSULTING_STATE
+			,CONSULTING_TITLE
+			<if test="companyId != null and companyId != ''">
+				,COMPANY_ID
+			</if>
+			)
+		VALUES (
+			CONSULTING_ID_SEQ.NEXTVAL
+			,#{consultingContents}
+			,TO_DATE(#{consultingDesiredDate}, 'YYYY-MM-DD HH24:MI')
+			,'C1'
+			, #{consultingTitle}
+			<if test="companyId != null and companyId != ''">
+				,#{companyId}
+			</if>
+		)
+	</insert>
+
+	<!-- if 태그 안에서 부등호 처리 법 -->
+	<!-- 부등호 <, 			대체식 lt 	예제  <if test="logCount lt 0"> -->
+	<!-- 부등호 >, 			대체식 gt 	예제  <if test="logCount gt 0"> -->
+	<!-- 부등호 <= (또는 =<), 	대체식 lte  	예제  <if test="logCount lte 0"> -->
+	<!-- 부등호 >= (또는 =>), 	대체식 gte 	예제  <if test="logCount gte 0"> -->
+	<!-- 2019.07.03 성재민 -->
+	<!-- 컨설팅 정보 수정 -->
+	<update id="updateConsulting" parameterType="ConsultingVO">
+		UPDATE CONSULTING
+		<set>
+			CONSULTING_DESIRED_DATE = TO_DATE(#{consultingDesiredDate}, 'YYYY-MM-DD HH24:MI')
+			,CONSULTING_CONTENTS 	= #{consultingContents}
+			,CONSULTING_TITLE 		= #{consultingTitle}
+			
+			<if test="consultingDate != null and consultingDate != ''">
+				,CONSULTING_DATE = TO_DATE(#{consultingDate}, 'YYYY-MM-DD HH24:MI')
+			</if>
+			<if test="consultingRemarks != null and consultingRemarks != ''">
+				,CONSULTING_REMARKS = #{consultingRemarks}
+			</if>
+			<if test="companyId != null and companyId != '' ">
+				,COMPANY_ID = #{companyId}
+			</if>
+			<if test="consultingState != null and consultingState != ''"> <!-- String으로 변환되어 수정함 -->
+				,CONSULTING_STATE = #{consultingState}
+			</if>
+		</set>
+		<where>
+			CONSULTING_ID = #{consultingId}
+		</where>
+	</update>
+
+	<delete id="deleteConsulting" parameterType="ConsultingVO">
+		DELETE FROM CONSULTING
+		<where>
+			CONSULTING_ID = #{consultingId}
+		</where>
+	</delete>
+
+	<!-- 단건 조회 -->
+ 	<select id="getConsulting" resultType="ConsultingVO">
+ 		SELECT CONSULTING_ID
+				,COMPANY_ID
+				,CONSULTING_CONTENTS
+				,TO_CHAR(CONSULTING_DESIRED_DATE, 'YYYY-MM-DD HH24:MI')		"consultingDesiredDate"
+				,TO_CHAR(CONSULTING_DATE, 'YYYY-MM-DD HH24:MI')				"consultingDate"
+				,CONSULTING_REMARKS
+				,CONSULTING_STATE
+				,CONSULTING_TITLE
+				
+		FROM CONSULTING
+		WHERE CONSULTING_ID = #{consultingId}
+	</select>
+	
+	<!-- 전체 조회 -->
+	<select id="getConsultingList" resultType="ConsultingVO">
+		SELECT B.* FROM( SELECT A.*, ROWNUM RN FROM (
+			SELECT CONSULTING_ID
+					,COMPANY_ID
+					,CONSULTING_CONTENTS
+					,TO_CHAR(CONSULTING_DESIRED_DATE, 'YYYY-MM-DD HH24:MI')		"consultingDesiredDate"
+					,TO_CHAR(CONSULTING_DATE, 'YYYY-MM-DD HH24:MI')				"consultingDate"
+					,CONSULTING_REMARKS
+					,CONSULTING_STATE
+					,CONSULTING_TITLE
+			FROM CONSULTING
+			<where>
+				COMPANY_ID = #{companyId}
+			</where>
+			ORDER BY CONSULTING_ID
+		) A ) B 
+		<where>
+			RN BETWEEN #{start} AND #{end}
+		</where>
+		
+	</select>
+	
+	<!-- 2019.07.10 성재민 -->
+	<!-- 컨설팅 개수 불러오기 -->
+	<select id="getConsultingCount" resultType="int">
+		SELECT COUNT(*)
+		FROM CONSULTING
+	</select>
+	
+	<!-- 2019.07.12 이승환 -->
+	<!--  managerConsulting 리스트 불러오기 -->
+	<!-- 2019.08.02 성재민 -->
+	<!-- 날짜를 가져올때 시:분 까지만 가져옴. -->
+	<select id="managerConsultingList" resultType="ConsultingVO">
+		SELECT B.* FROM (SELECT A.* , ROWNUM RN FROM (
+			SELECT 	CONSULTING_ID
+				,COMPANY_ID
+				,CONSULTING_TITLE				
+				,TO_CHAR(CONSULTING_DESIRED_DATE, 'YYYY-MM-DD HH24:MI')	"consultingDesiredDate"
+				,TO_CHAR(CONSULTING_DATE, 'YYYY-MM-DD HH24:MI')			"consultingDate"
+				,CONSULTING_STATE
+				,FIND_CODENM(CONSULTING_STATE) AS consultingStateName
+		FROM CONSULTING
+		<where>
+			<if test="searchKeyword != null and searchKeyword != ''">
+				${searchConsulting} like '%' || #{searchKeyword} || '%'
+			</if>
+		</where>
+		<if test="sort == null or sort==''">
+			ORDER BY CONSULTING_ID DESC
+		</if>
+		<if test="sort != null and sort != ''">
+			ORDER BY ${sort}
+		</if>
+		<![CDATA[
+			) A ) B WHERE RN >=#{start} AND RN <=#{end}
+		]]>
+	</select>
+	
+	<!-- 07.16 승환추가 -->
+	<!-- count 불러오기 -->
+	<select id="getManagerConsultingCount" resultType="int">
+		SELECT COUNT(*)
+		FROM CONSULTING
+	</select>
+	
+	<!-- managerConsulting Detail 불러오기 : 승환추가 -->
+	<select id="getManagerConsulting" resultType="ConsultingVO">
+		SELECT CONSULTING_ID
+				, COMPANY_ID
+				, CONSULTING_CONTENTS
+				, TO_CHAR(CONSULTING_DESIRED_DATE, 'YYYY-MM-DD HH24:MI')	"consultingDesiredDate"
+				, TO_CHAR(CONSULTING_DATE, 'YYYY-MM-DD HH24:MI')			"consultingDate"
+				, CONSULTING_REMARKS
+				, FIND_CODENM(CONSULTING_STATE) AS CONSULTING_STATE_NM
+				, CONSULTING_TITLE
+				, CONSULTING_STATE											"consultingState"
+		FROM CONSULTING
+		WHERE CONSULTING_ID = #{consultingId}
+
+	</select>
+	<!-- 승환추가 07.15 -->
+	<update id="managerUpdateConsulting" parameterType="ConsultingVO">
+		UPDATE CONSULTING
+		<set>
+			CONSULTING_CONTENTS 	= #{consultingContents}
+			,CONSULTING_TITLE 		= #{consultingTitle}
+			,CONSULTING_STATE		= #{consultingState}
+			,CONSULTING_DESIRED_DATE = TO_DATE(#{consultingDesiredDate}, 'YYYY-MM-DD HH24:MI')	
+			<if test="consultingDate != null and consultingDate != ''">
+				,CONSULTING_DATE = TO_DATE(#{consultingDate}, 'YYYY-MM-DD HH24:MI')
+			</if>  
+			<if test="consultingRemarks != null and consultingRemarks != ''">
+				,CONSULTING_REMARKS = #{consultingRemarks}
+			</if>
+		</set>
+		WHERE CONSULTING_ID = #{consultingId}
+	</update>
+	
+	<insert id="managerConsultingInsert" parameterType="ConsultingVO">
+		INSERT INTO CONSULTING(
+			CONSULTING_ID
+			<if test="companyId != null and companyId != ''">
+				,COMPANY_ID
+			</if>
+			,CONSULTING_CONTENTS
+			,CONSULTING_DESIRED_DATE
+			,CONSULTING_DATE
+			,CONSULTING_REMARKS
+			,CONSULTING_STATE
+			,CONSULTING_TITLE
+			)
+		VALUES (
+			CONSULTING_ID_SEQ.NEXTVAL
+			<if test="companyId != null and companyId != ''">
+			,#{companyId}
+			</if>
+			, #{consultingContents}
+			, TO_DATE(#{consultingDesiredDate}, 'YYYY-MM-DD HH24:MI')
+			, TO_DATE(#{consultingDate}, 'YYYY-MM-DD HH24:MI')
+			, #{consultingRemarks}
+			, #{consultingState}
+			, #{consultingTitle}
+		)
+	</insert>
+	
+	<delete id="managerConsultingDelete" parameterType="ConsultingVO">
+		DELETE FROM CONSULTING
+		<where>
+			<choose>
+				<when test="consultingList != null and consultingList.length>0">
+					CONSULTING_ID in
+					<foreach collection="consultingList"
+							 open="(" close=")" separator=","
+							 item="item">
+							 #{item}
+					</foreach>
+				</when>
+				<otherwise>
+					CONSULTING_ID = #{consultingId}
+				</otherwise>
+			</choose>
+		</where>
+	</delete>
+	
+	<select id="mainConsultingList" resultType="ConsultingVO">
+	SELECT B.* FROM (SELECT A.* , ROWNUM RN FROM (
+			SELECT 	CONSULTING_ID
+
+				,CONSULTING_TITLE				
+				,CONSULTING_DESIRED_DATE		"consultingDesiredDate"
+				,FIND_CODENM(CONSULTING_STATE) AS consultingStateName
+		FROM CONSULTING
+			<![CDATA[
+			) A ) B WHERE RN >= #{start} AND RN <=#{end}
+			]]>
+	
+	</select>
+</mapper>
+ 
+ 

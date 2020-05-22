@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="takeExamDAO">
+
+	<!-- -->
+
+	<select id="getExamList" resultType="TakeExamVO">
+	SELECT B.* FROM( SELECT A.*, ROWNUM RN FROM (
+		SELECT 
+				TAKE_EXAM_ID
+				,TAKE_EXAM_DATE
+				,SCORE
+				,EXAM_ID
+				,TAKER_ID
+		FROM 	TAKE_EXAM
+		<where>
+		TAKER_ID = #{takerId}
+		</where>
+		ORDER BY TAKE_EXAM_DATE DESC
+	) A ) B
+	<where>
+			RN BETWEEN #{start} AND #{end}
+	</where>
+		
+	</select>
+	
+	
+	<select id="getExamCount" resultType="int">
+		SELECT 	COUNT(*)
+		FROM 	TAKE_EXAM
+	</select>
+	
+	<!-- 2019.07.17 김재용 -->
+	<!-- 유저 ID 와 시험 ID 로 TAKE_EXAM 값가져오기 -->
+	<select id="selectTakeExamId" resultType="TakeExamVO">
+		SELECT	TAKE_EXAM_ID
+				,EXAM_ID
+				,TAKER_ID
+				,NVL(SCORE,9999) SCORE
+				,TAKE_EXAM_DATE
+			FROM	TAKE_EXAM
+		
+		WHERE TAKER_ID = #{takerId} AND EXAM_ID = #{examId}
+	</select>
+	
+	<!-- 2019.07.16 성재민 -->
+	<!-- 시험 ID 로 조회 -->
+	<select id="getTakeExamForExamId" resultType="TakeExamVO">
+		SELECT	
+				TAKE_EXAM_ID
+			, 	TAKE_EXAM_DATE
+			,	SCORE
+			,	EXAM_ID
+			,	TAKER_ID
+		FROM	TAKE_EXAM
+		<where>
+			EXAM_ID = #{examId}
+		</where>
+	</select>
+	
+	<!-- 2019.07.17 성재민 -->
+	<!-- 단건 조회 -->
+	<select id="getTakeExam" resultType="TakeExamVO">
+		SELECT	
+				TAKE_EXAM_ID
+			, 	TAKE_EXAM_DATE
+			,	SCORE
+			,	EXAM_ID
+			,	TAKER_ID
+		FROM	TAKE_EXAM
+		<where>
+			TAKE_EXAM_ID = #{takeExamId}
+		</where>
+	</select>
+	
+	<!-- 2019.07.19 김재용 -->
+	<!-- 응시시작 인서트  -->
+	<insert id="insertTakeExam">
+		INSERT	INTO	TAKE_EXAM	(	TAKE_EXAM_ID
+										,TAKE_EXAM_DATE
+										,SCORE
+										,EXAM_ID
+										,TAKER_ID	)
+				VALUES				(	TAKE_EXAM_ID_SEQ.NEXTVAL
+										,SYSDATE
+										,NULL
+										,#{examId}
+										,#{takerId}
+									)
+	</insert>
+	
+</mapper>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:websocket="http://www.springframework.org/schema/websocket"
+	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.0.xsd
+		http://www.springframework.org/schema/websocket http://www.springframework.org/schema/websocket/spring-websocket-4.3.xsd
+		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+	
+	<!-- Root Context: defines shared resources visible to all other web components -->
+	<!-- Root Context: defines shared resources visible to all other web components -->
+<!--  
+	<security:http>
+	<security:intercept-url method="GET" pattern="/login.jsp" access="permitAll()" />
+	<security:intercept-url pattern="/top.jsp" access="permitAll()" />
+	<security:intercept-url pattern="/admin/**" access="hasAuthority('ROLE_ADMIN')" />
+	<security:intercept-url pattern="/**" access="isAuthenticated()" />
+	<security:form-login  login-page="/login.jsp"
+					      login-processing-url="/processLogin"
+					      default-target-url="/top.jsp"
+					      authentication-failure-url="/login.jsp"
+					      username-parameter="paramLoginId"
+					      password-parameter="paramPassword"/>
+    <security:logout logout-url="/logout" logout-success-url="/top.jsp"/>
+    <security:access-denied-handler error-page="/accessDenied.jsp"/>
+
+	<security:csrf disabled="true" />
+	</security:http>
+	
+	<security:authentication-manager>
+ 		<security:authentication-provider>
+			<security:jdbc-user-service data-source-ref="authDataSource" 
+										users-by-username-query="select TAKER_ID, TAKER_PASSWORD, 1 from USERVIEW where TAKER_ID = ?"
+										authorities-by-username-query="select TAKER_ID, USER_TYPE from USERVIEW	where TAKER_ID = ?" />
+			</security:authentication-provider> 
+		</security:authentication-manager>
+
+	<context:property-placeholder location="classpath:database.properties"/>
+-->
+	
+	<!-- datasource 설정 -->
+	<bean id="authDataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="${jdbc.driver}"></property>
+		<property name="url" value="${jdbc.url}"></property>
+		<property name="username" value="${jdbc.username}"></property>
+		<property name="password" value="${jdbc.password}"></property>
+		<property name="maxActive" value="3"></property>
+		<property name="maxWait" value="2000"></property>
+	</bean>	
+	
+   
+   <bean id="mailSender" 
+	class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host" value="smtp.gmail.com" />
+		<property name="port" value="587" />
+		<property name="username" value="freehwans@gmail.com" />
+		<property name="password" value="mvahjgubpnfqxuob" />
+		<property name="defaultEncoding" value="utf-8"/>
+		<property name="javaMailProperties">
+			<props>
+				<prop key="mail.smtp.starttls.enable">true</prop>
+			</props>
+		</property>
+	</bean>
+</beans>

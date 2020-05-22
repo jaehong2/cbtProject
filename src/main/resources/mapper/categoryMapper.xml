@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="categoryDAO">
+	<!-- 190703 재홍 CRUD 쿼리 입력 -->
+	<!-- 카테고리 등록 -->
+	<!-- 2019.07.04 성재민 -->
+	<!-- where update set 부분을 쿼리가 아니라 키워드 명령어로 처리 하게 변경  -->
+	<!-- 2019.07.05 성재민 -->
+	<!-- 카테고리 이름 컬럼 추가 -->
+	<insert id="insertCategory" parameterType="CategoryVO">
+		INSERT INTO CATEGORY (	  
+				CATEGORY_ID
+				,CATEGORY_NAME
+				,CATEGORY_MAIN_ID
+				,CATEGORY_MIDDLE_ID
+				,CATEGORY_SMALL_ID
+			)
+		VALUES (  
+				category_id_seq.nextval
+				, #{categoryName}
+				, #{categoryMainId}
+				, #{categoryMiddleId}
+				, #{categorySamllId} 
+			)
+	</insert>
+	
+	<!-- if 태그 안에서 부등호 처리 법 -->
+	<!-- 부등호 <, 			대체식 lt 	예제  <if test="logCount lt 0"> -->
+	<!-- 부등호 >, 			대체식 gt 	예제  <if test="logCount gt 0"> -->
+	<!-- 부등호 <= (또는 =<), 	대체식 lte  	예제  <if test="logCount lte 0"> -->
+	<!-- 부등호 >= (또는 =>), 	대체식 gte 	예제  <if test="logCount gte 0"> -->
+	
+	<!-- 카테고리 수정 -->
+	<!-- 전달되는 값이 하나라도 null 이거나 0 이하라면 진행하지 않는다. -->
+	<update id="updateCategory" parameterType="CategoryVO">
+		UPDATE CATEGORY
+		<set>
+			CATEGORY_MAIN_ID   		= #{categoryMainId}
+			, CATEGORY_NAME			= #{categoryName}
+			, CATEGORY_MIDDLE_ID 	= #{categoryMiddleId}
+			, CATEGORY_SMALL_ID  	= #{categorySamllId}
+		</set>
+		<where>
+			CATEGORY_ID = #{categoryId}
+		</where>
+	</update>
+	
+	<!-- 카테고리 삭제  -->
+	<delete id="deleteCategory" parameterType="CategoryVO">
+		DELETE FROM CATEGORY
+		<where>
+			CATEGORY_ID = #{categoryId}
+		</where>
+	</delete>
+	
+	<!-- 2019.07.07 성재민 -->
+	<!-- 값이 제대로 넘어오지 않아서 별칭으로 수정 -->
+	<!-- 카테고리 ID로 조회  -->
+	<select id="getCategory" resultType="CategoryVO">
+		SELECT 
+			CATEGORY_ID				"categoryId"
+			,CATEGORY_NAME			"categoryName"
+			,CATEGORY_MAIN_ID		"categoryMainId"
+			,CATEGORY_MIDDLE_ID		"categoryMiddleId"
+			,CATEGORY_SMALL_ID		"categorySamllId"
+		FROM CATEGORY
+		<where>
+			CATEGORY_ID = #{categoryId}
+		</where>
+	</select>
+	
+	<!-- 2019.07.07 성재민 -->
+	<!-- 값이 제대로 넘어오지 않아서 별칭으로 수정 -->
+	<!-- 모든 카테고리 조회 -->
+	<select id="getAllCategory" resultType="CategoryVO">
+		SELECT 
+			CATEGORY_ID				"categoryId"
+			,CATEGORY_NAME			"categoryName"
+			,CATEGORY_MAIN_ID		"categoryMainId"
+			,CATEGORY_MIDDLE_ID		"categoryMiddleId"
+			,CATEGORY_SMALL_ID		"categorySamllId"
+		FROM CATEGORY
+	</select>
+	
+	<!-- 2019.07.08 성재민 -->
+	<!-- 카테고리 와 대/중/소 분류 이름을 join 하여서 다 가져옴 -->
+	<select id="getAllCategoryMap" resultType="map">
+		SELECT 
+				CATEGORY_ID 			"categoryId"
+				,CATEGORY_NAME 			"categoryName"
+				,CATEGORY_MAIN_NAME 	"categoryMainName"
+				,CATEGORY_MIDDLE_NAME 	"categoryMiddleName"
+				,CATEGORY_SMALL_NAME	"categorySamllName"
+		FROM 	CATEGORY C
+		JOIN 	CATEGORY_MAIN M
+		ON 		C.CATEGORY_MAIN_ID 		= M.CATEGORY_MAIN_ID
+		JOIN 	CATEGORY_MIDDLE MI
+		ON 		C.CATEGORY_MIDDLE_ID 	= MI.CATEGORY_MIDDLE_ID
+		JOIN 	CATEGORY_SMALL S
+		ON 		C.CATEGORY_SMALL_ID 	= S.CATEGORY_SMALL_ID
+		ORDER BY CATEGORY_ID
+	</select>
+</mapper>

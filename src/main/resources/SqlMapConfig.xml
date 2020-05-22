@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<!-- type의 값에 경로를 적음. -->
+<configuration>
+	<settings>
+		<!-- 오라클 컬럼이 first_name 를 VO firstName 처럼 카멜케이스로 변환 -->
+		<setting name="mapUnderscoreToCamelCase" value="true" />
+	</settings>
+
+	<typeAliases>
+		<typeAlias type="com.cbt.company.CompanyVO" 				alias="CompanyVO" />
+		<typeAlias type="com.cbt.candidate.CandidateVO" 			alias="CandidateVO" />	
+		<typeAlias type="com.cbt.category.CategoryVO" 				alias="CategoryVO" />
+		<typeAlias type="com.cbt.categoryMain.CategoryMainVO" 		alias="CategoryMainVO" />
+		<typeAlias type="com.cbt.categoryMiddle.CategoryMiddleVO" 	alias="CategoryMiddleVO" />
+		<typeAlias type="com.cbt.categorySmall.CategorySmallVO" 	alias="CategorySmallVO" />
+		<typeAlias type="com.cbt.condition.ConditionVO" 			alias="ConditionVO" />
+		<typeAlias type="com.cbt.consulting.ConsultingVO" 			alias="ConsultingVO" />
+		<typeAlias type="com.cbt.estimate.EstimateVO" 				alias="EstimateVO" />
+		<typeAlias type="com.cbt.exam.ExamVO" 						alias="ExamVO" />
+		<typeAlias type="com.cbt.manager.ManagerVO" 				alias="ManagerVO" />
+		<typeAlias type="com.cbt.manager.ManagerTakerVO" 			alias="ManagerTakerVO" /><!-- 7/5 재용추가 -->
+		<typeAlias type="com.cbt.question.QuestionVO" 				alias="QuestionVO" />
+		<typeAlias type="com.cbt.setExamQuestion.SetExamQuestionVO" alias="SetExamQuestionVO" />
+		<typeAlias type="com.cbt.survey.SurveyVO" 					alias="SurveyVO" />
+		<typeAlias type="com.cbt.takeExam.TakeExamVO" 				alias="TakeExamVO" />
+		<typeAlias type="com.cbt.takeExamHistory.TakeExamHistoryVO" alias="TakeExamHistoryVO" />
+		<typeAlias type="com.cbt.Inquiry.InquiryVO" 				alias="InquiryVO" /> 		<!-- 2019.07.20 성재민 문의 관련 기능 추가 -->
+		<typeAlias type="com.cbt.privateExam.PrivateExamVO" 		alias="PrivateExamVO" /> 	<!-- 2019.07.23 성재민 비공개 시험 관련 기능 추가 -->
+	</typeAliases>
+</configuration>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

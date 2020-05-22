@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="EstimateDAO">
+	<!-- 190703 재홍 CRUD 쿼리 입력 -->
+	<!-- 의뢰 등록 -->
+	<insert id="insertEstimate" parameterType="EstimateVO">
+		<selectKey keyProperty="estimateId" resultType="int" order="BEFORE">
+			SELECT NVL(MAX(ESTIMATE_ID),0)+1 FROM ESTIMATE
+		</selectKey>
+		INSERT INTO ESTIMATE (	  ESTIMATE_ID
+								, ESTIMATE_PRICE
+								, REQUEST_DAY
+								, TRADE_PROGRESS
+								, REMARKS
+								, APPLICANTS
+								
+								, LEVEL_OF_DIFFICULTY
+								, CANDIDATE
+								, APPLY_PURPOSE
+								, EXAM_DATE
+								, CATEGORY_ID
+								
+								, EXAM_CLASSFICATION
+								, COMPANY_ID
+								, EXAM_INTERVAL
+								, ESTIMATE_NAME )
+		VALUES ( #{estimateId}
+				,#{estimatePrice}
+				,SYSDATE <!-- REQUEST_DAY ESTIMATE_ID_SEQ-->
+				, 'B1' <!-- 의뢰진행상태 : 진행전상태 ==B1 -->
+				,#{remarks}
+				,#{applicants}
+				
+				,#{levelOfDifficulty}
+				,#{candidate}
+				,#{applyPurpose}
+				,#{examDate}
+				,#{categoryId}
+				
+				,#{examClassfication}
+				,#{companyId}
+				,#{examInterval}
+				,#{estimateName})
+	</insert>
+	
+	<!-- 의뢰 수정 -->
+	<update id="updateEstimate" parameterType="EstimateVO">
+		UPDATE ESTIMATE
+		SET	  ESTIMATE_ID 		= #{estimateId}
+			, ESTIMATE_PRICE 	= #{estimatePrice}
+			, REQUEST_DAY 		= SYSDATE
+			, TRADE_PROGRESS 	= #{tradeProgress}
+			, REMARKS 			= #{remarks}
+			, APPLICANTS		= #{applicants}
+			
+			, LEVEL_OF_DIFFICULTY = #{levelOfDifficulty}
+			, CANDIDATE 		= #{candidate}
+			, APPLY_PURPOSE 	= #{applyPurpose}
+			, EXAM_DATE 		= #{examDate}
+			, CATEGORY_ID		= #{categoryId}
+			
+			, EXAM_CLASSFICATION= #{examClassfication}
+			, COMPANY_ID		= #{companyId}
+			, EXAM_INTERVAL		= #{examInterval}
+			, ESTIMATE_NAME		= #{estimateName}
+			
+		WHERE ESTIMATE_ID = #{estimateId}
+	</update>
+	
+	<!-- 의뢰 ID로 삭제 -->
+	<delete id="deleteEstimate" parameterType="EstimateVO">
+		DELETE FROM ESTIMATE
+		WHERE ESTIMATE_ID = #{estimateId}
+	</delete>
+	
+	<!-- 의뢰목록 ID로 조회 -->
+	<select id="getEstimate" resultType="EstimateVO">
+    	   SELECT 	  E.ESTIMATE_ID
+          			, C.CATEGORY_NAME AS CATEGORYNAME
+					, E.ESTIMATE_PRICE								"estimatePrice"
+					, E.REQUEST_DAY
+					, E.TRADE_PROGRESS
+					, FIND_CODENM(TRADE_PROGRESS)					"tradeProgressName"
+					, E.REMARKS
+					, E.APPLICANTS
+					, E.LEVEL_OF_DIFFICULTY
+					, E.CANDIDATE
+					, E.APPLY_PURPOSE
+					, E.EXAM_DATE
+					, E.CATEGORY_ID									"categoryId"
+					, E.EXAM_CLASSFICATION
+					, E.COMPANY_ID									"companyId"
+					, E.EXAM_COUNT
+					, FIND_CODENM(APPLY_PURPOSE)					"applyPurposeName"
+					, FIND_CODENM(CANDIDATE)						"candidateName"
+					, FIND_CODENM(EXAM_COUNT)						"examCountName"
+					, E.EXAM_INTERVAL								"examInterval"
+					, E.ESTIMATE_NAME								"estimateName"
+					, E.PAYMENT_DATE								"paymentDate"
+         			, COM.COMPANY_EMAIL           					"companyEmail"
+		FROM ESTIMATE  E JOIN  CATEGORY C
+      	ON C.CATEGORY_ID = E.CATEGORY_ID
+   		JOIN COMPANY COM
+   		ON COM.COMPANY_ID = E.COMPANY_ID
+       	
+		WHERE ESTIMATE_ID = #{estimateId}
+		
+	</select>
+	
+	<!-- 의뢰목록 전체 or 단건 조회 -->
+		<select id="getEstimateList" resultType="EstimateVO">
+		   SELECT B.* FROM( SELECT A.*, ROWNUM RN FROM (
+			 SELECT   E.ESTIMATE_ID					"estimateId"
+        		    , C.CATEGORY_NAME  				"categoryName"
+					, E.ESTIMATE_PRICE				"estimatePrice"
+					, E.REQUEST_DAY					"requestDay"
+					, E.TRADE_PROGRESS				"tradeProgress"
+					, FIND_CODENM(TRADE_PROGRESS) 	"tradeProgressName"
+					, E.REMARKS	
+					, E.APPLICANTS
+					, E.LEVEL_OF_DIFFICULTY
+					, FIND_CODENM(LEVEL_OF_DIFFICULTY) 	"levelOfDifficultyName"
+					, E.CANDIDATE
+					, FIND_CODENM(CANDIDATE)			"candidateName"
+					, E.APPLY_PURPOSE
+					, FIND_CODENM(APPLY_PURPOSE)		"applyPurposeName"
+					, E.EXAM_DATE
+					, E.CATEGORY_ID
+					, E.EXAM_CLASSFICATION
+					, FIND_CODENM(EXAM_CLASSFICATION) 	"examClassficationName"
+					, E.COMPANY_ID
+					, E.EXAM_COUNT
+					, FIND_CODENM(EXAM_COUNT) 			"examCountName"
+					, E.EXAM_INTERVAL
+					, FIND_CODENM(EXAM_INTERVAL) 		"examIntervalName"
+					, E.ESTIMATE_NAME
+			
+			FROM ESTIMATE  E JOIN  CATEGORY C
+	   		ON C.CATEGORY_ID = E.CATEGORY_ID
+	     <where>
+      	<if test = "companyId != null and companyId != ''">COMPANY_ID = #{companyId}</if> <!-- 접속한 기업의 정보만 가져올수있도록 세션처리를 위함 -->
+      	<if test = "estimateId != null and estimateId != ''">ESTIMATE_ID = #{estimateId}</if> <!-- 접속한 기업의 정보만 가져올수있도록 세션처리를 위함 -->
+      </where>
+			ORDER BY E.ESTIMATE_ID DESC
+		) A ) B 
+		<where>
+		<if test = "start != null and start != ''">
+			<if test = "end != null and end != ''">
+				RN BETWEEN #{start} AND #{end}
+			</if>	
+		</if>
+			
+		</where>
+		
+		
+	</select>
+	
+	
+	<!-- 페이징처리를 위한 의뢰 행 갯수를 가지고옴 특정기업으로 -->
+	<select id="getCount" resultType="int">
+			SELECT COUNT(*) FROM ESTIMATE
+			<where>
+      			<if test = "companyId != null and companyId != ''">COMPANY_ID = #{companyId}</if> <!-- 접속한 기업의 정보만 가져올수있도록 세션처리를 위함 -->
+     		</where>
+	</select>
+		
+	
+	
+	<!-- 전체 카테고리 이름 가져옴 -->
+	<select id ="getCateoryNameList" resultType="CategoryVO">
+		SELECT 	 CATEGORY_ID	"categoryId"
+				,CATEGORY_NAME	"categoryName"
+		FROM CATEGORY
+	</select>
+	
+	
+	<update id="updatesTradeProgressExchange2" >
+		UPDATE ESTIMATE
+		SET	 
+			 TRADE_PROGRESS 	=  'B2'
+		WHERE ESTIMATE_ID       =  #{value}
+	</update>
+	
+	<update id="updatesTradeProgressExchange3" >
+		UPDATE ESTIMATE
+		SET	 
+			 TRADE_PROGRESS 	=  'B3'
+		WHERE ESTIMATE_ID       =  #{estimateId}
+	</update>
+	
+	<update id="updatesTradeProgressExchange4">
+		UPDATE ESTIMATE
+		SET	 
+			 TRADE_PROGRESS 	=  'B4'
+		WHERE ESTIMATE_ID = #{estimateId}
+	</update>
+	
+	<update id="updatesTradeProgressExchange5">
+		UPDATE ESTIMATE
+		SET	 
+			 TRADE_PROGRESS 	=  'B5'
+			,PAYMENT_DATE		=  SYSDATE
+		WHERE ESTIMATE_ID = #{estimateId}
+	</update>
+	
+	
+</mapper>

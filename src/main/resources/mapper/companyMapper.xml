@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 2019.06.27 성재민 -->
+<!-- 컴퍼니 관련 dao 처리 -->
+<mapper namespace="companyDAO">
+
+	<!-- 2019.06.27 성재민 -->
+	<!-- 컴퍼니 등록 sql -->
+	<!-- 2019.07.02 성재민 -->
+	<!-- COMPANY_MANAGER_TELNUM 추가 -->
+	<insert id="insertCompany" parameterType="CompanyVO">
+		INSERT INTO COMPANY(
+				COMPANY_ID
+				,COMPANY_PASSWORD
+				,COMPANY_NAME
+				,BUSINESS_NUMBER
+				,COMPANY_CLASSIFICATION
+				,COMPANY_SECTORS
+				,COMPANY_CREDIT
+				,COMPANY_MANAGER
+				,COMPANY_MANAGER_TELNUM
+				,COMPANY_EMAIL
+			)
+		VALUES (
+				#{companyId}
+				,#{companyPassword}
+				,#{companyName}
+				,#{businessNumber}
+				,#{companyClassification}
+				,#{companySectors}
+				,#{companyCredit}
+				,#{companyManager}
+				,#{companyManagerTelNum}
+				,#{companyEmail}
+			)
+	</insert>
+
+	<!-- 2019.07.03 성재민 -->
+	<!-- 기업 정보 수정 -->
+	<update id="updateCompany" parameterType="CompanyVO">
+		UPDATE COMPANY
+		<set>
+			<if test="companyPassword != null and companyPassword != '' ">
+				COMPANY_PASSWORD = #{companyPassword},
+			</if>
+			<if test="companyName != null and companyName != '' ">
+				COMPANY_NAME = #{companyName},
+			</if>
+			<if test="businessNumber != null and businessNumber != '' "> 
+				BUSINESS_NUMBER = #{businessNumber},
+			</if>
+			<if test="companyClassification != null and companyClassification != '' "> 
+				COMPANY_CLASSIFICATION = #{companyClassification},
+			</if>
+			<if test="companySectors != null and companySectors != '' ">
+				COMPANY_SECTORS = #{companySectors},
+			</if>
+			<if test="companyCredit != null and companyCredit != '' ">
+				COMPANY_CREDIT = #{companyCredit},
+			</if>
+			<if test="companyManager != null and companyManager != '' ">
+				COMPANY_MANAGER = #{companyManager},
+			</if>
+			<if test="companyManagerTelNum != null and companyManagerTelNum != '' ">
+				COMPANY_MANAGER_TELNUM = #{companyManagerTelNum},
+			</if>
+			<if test="companyEmail != null and companyEmail != '' ">
+				COMPANY_EMAIL = #{companyEmail},
+			</if>
+		</set>
+		<where>
+			COMPANY_ID = #{companyId}
+		</where>
+	</update>
+	
+	<!-- 단건, 다건 삭제 // 이승환추가 -->
+	<delete id="deleteCompany" parameterType="CompanyVO">
+		DELETE FROM COMPANY
+		<where>
+			<choose>
+				<when test="cpnList != null and cpnList.length>0">
+					COMPANY_ID in
+					<foreach collection="cpnList"
+							 open="(" close=")" separator=","
+							 item="item">
+							 #{item}
+					</foreach>
+				</when>
+				<otherwise>
+					COMPANY_ID = #{companyId}
+				</otherwise>
+			</choose>
+		</where>
+	</delete>
+
+	<!-- 단건 조회 -->
+	<!-- "" alias 를 이용하여 소문자로 변경. -->
+	<select id="getCompanyID" resultType="CompanyVO">
+		SELECT 
+			COMPANY_ID
+			,COMPANY_PASSWORD
+			,COMPANY_NAME
+			,BUSINESS_NUMBER
+			,FIND_CODENM(COMPANY_CLASSIFICATION) AS COMPANY_CLASSIFICATION_NAME
+			,FIND_CODENM(COMPANY_SECTORS) AS COMPANY_SECTORS_NAME
+			,COMPANY_CREDIT
+			,COMPANY_MANAGER
+			,COMPANY_MANAGER_TELNUM
+			,COMPANY_EMAIL
+		FROM COMPANY
+		<where>
+			COMPANY_ID = #{companyId}
+		</where>
+	</select>
+	<select id="getCompanyIDPW" resultType="CompanyVO">
+		SELECT 
+			COMPANY_ID
+			,COMPANY_PASSWORD
+			,COMPANY_NAME
+			,BUSINESS_NUMBER
+			,COMPANY_CLASSIFICATION
+			,COMPANY_SECTORS
+			,COMPANY_CREDIT
+			,COMPANY_MANAGER
+			,COMPANY_MANAGER_TELNUM
+			,COMPANY_EMAIL
+		FROM COMPANY
+		<where>
+			COMPANY_ID = #{companyId}
+			AND COMPANY_PASSWORD = #{companyPassword}
+		</where>
+	</select>
+	
+	<!-- 2019.07.31 성재민 -->
+	<!-- 사업자 번호 체크를 위해 입력한 사업자 번호와 동일한 번호가 있는지 확인하는 질의 -->
+	<select id="getBusinessNumCount" resultType="int">
+		SELECT 
+			COUNT(BUSINESS_NUMBER)
+		FROM COMPANY
+		<where>
+			BUSINESS_NUMBER = #{businessNumber}
+		</where>
+	</select>
+	
+	
+	
+</mapper>
+ 
+
+ 

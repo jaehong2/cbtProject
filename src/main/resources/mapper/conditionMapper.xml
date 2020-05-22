@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ConditionDAO">
+
+	<!-- 2019.07.04 이승환 -->
+	<insert id="insertCondition" parameterType="ConditionVO">
+		<selectKey keyProperty="conditionSeq" resultType="int" order="BEFORE">
+			SELECT
+			MAX(CONDITION_SEQ) + 1 FROM CONDITION
+		</selectKey>
+		INSERT INTO CONDITION( 
+								  CONDITION_SEQ
+								, MASTER_CD
+								, MASTER_NM
+								, DETAIL_CD
+								, DETAIL_NM
+								, USE_YN 
+					)
+		VALUES (		#{conditionSeq}
+						, #{masterCd}
+						, #{masterNm}
+						, #{detailCd}
+						, #{detailNm}
+						, #{useYn}
+						)	
+	</insert>
+	
+	<!-- 다건조회 -->
+	<select id="getConditionList" resultType="ConditionVO">
+		SELECT 
+			CONDITION_SEQ 
+			, MASTER_CD
+			, MASTER_NM
+			, DETAIL_CD
+			, DETAIL_NM
+			, USE_YN
+		FROM CONDITION
+		ORDER BY CONDITION_SEQ
+	</select>
+	
+
+	
+	<!-- 상태 수정 -->
+	<update id="updateCondition" parameterType="ConditionVO">
+		UPDATE CONDITION
+		<set>
+			<if test="masterCd != null">MASTER_CD = #{masterCd}, </if>
+			<if test="masterNm != null">MASTER_NM = #{masterNm}, </if>
+			<if test="detailCd != null">DETAIL_CD = #{detailCd}, </if>
+			<if test="detailNm != null">DETAIL_NM = #{detailNm}, </if>
+			<if test="useYn != null">USE_YN = #{useYn} </if>
+		</set>
+		WHERE CONDITION_SEQ = #{conditionSeq}
+	</update>
+	
+	<!-- 상태 삭제 -->
+	<delete id="deleteCondition" parameterType="ConditionVO">
+		DELETE FROM CONDITION
+		<where>
+			<choose>
+				<when test="cdTionList != null and cdTionList.length>0">
+					CONDITION_SEQ in
+					<foreach collection="cdTionList"
+						open="(" close=")" separator=","
+						item="item">
+						#{item}
+					</foreach>
+				</when>
+				<otherwise>
+					CONDITION_SEQ = #{conditionSeq}
+				</otherwise>
+			</choose>
+		</where>
+	</delete>   
+	
+	<!-- 단건 코드 조회 -->
+	<select id="getCondition" resultType="ConditionVO">
+		SELECT 
+			CONDITION_SEQ 
+			, MASTER_CD
+			, MASTER_NM
+			, DETAIL_CD
+			, DETAIL_NM
+			, USE_YN
+		FROM CONDITION
+		WHERE CONDITION_SEQ = #{conditionSeq}
+	</select>
+	
+	
+	<!-- 디테일 코드 조회 -->
+	<select id="getConditionDetailList" resultType="ConditionVO">
+		SELECT 
+			  DETAIL_CD
+			, DETAIL_NM
+			, USE_YN
+		FROM CONDITION
+		WHERE MASTER_CD = #{value}
+	</select>
+	
+</mapper>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.0.xsd
+		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+
+	<!-- Root Context: defines shared resources visible to all other web components -->
+	<security:http pattern="/js/**" security="none"/>
+	<security:http pattern="/image/**" security="none"/>
+	<security:http pattern="/css/**" security="none"/>
+	<security:http pattern="/BootstrapAdminTheme/**" security="none"/>
+	<security:http pattern="/chatImages/**" security="none"/>
+	<security:http pattern="/DocumentForm/**" security="none"/>
+	<security:http pattern="/common/**" security="none"/>
+	
+	<security:http>
+		<security:intercept-url 
+			pattern="/" access="permitAll()" />
+			<security:intercept-url 
+			pattern="/candidateInIntroduce.do" access="permitAll()" />
+		<security:intercept-url 
+			pattern="/candidateMain.do" access="permitAll()" />
+		<security:intercept-url method="GET"
+			pattern="/candidateLogin.do" access="permitAll()" />
+		<security:intercept-url
+			pattern="/idcheck.do" access="permitAll()" />
+		<security:intercept-url
+			pattern="/businessNumCheck.do/{businessNum}" access="permitAll()" />
+		<security:intercept-url
+			pattern="/Emailcheck.do" access="permitAll()" />
+		<security:intercept-url
+			pattern="/insertCandidate.do" access="permitAll()" />
+		<security:intercept-url
+			pattern="/candidateScheduleCheck.do" access="permitAll()" />
+		<security:intercept-url
+			pattern="/findID.do" access="permitAll()" />
+		<security:intercept-url
+			pattern="/oauth" access="permitAll()" />
+		<security:intercept-url
+			pattern="/companySignUp.do" access="permitAll()" />
+		<security:intercept-url
+			pattern="/chat.do" access="permitAll()" />
+		<security:intercept-url
+			pattern="/echo.do" access="permitAll()" />
+		<security:intercept-url pattern="/manager*"
+			access="hasAuthority('ROLE_MANAGER')" />
+		<security:intercept-url pattern="/company*"
+			access="hasAuthority('ROLE_COMPANY')" />			
+		<security:intercept-url pattern="/**"
+			access="isAuthenticated()" />
+		<security:form-login
+			login-page="/candidateLogin.do" login-processing-url="/processLogin.do"
+			default-target-url="/main.do"
+			authentication-failure-url="/candidateLogin.do"
+			username-parameter="takerId" password-parameter="takerPassword" />
+		<security:logout logout-url="/logout"
+			logout-success-url="/candidateMain.do" />
+		<security:access-denied-handler
+			error-page="/accessDenied.jsp" />
+
+		<security:csrf disabled="true" />
+	</security:http>
+
+	<security:authentication-manager>
+		<security:authentication-provider
+			user-service-ref="customerUserService">
+			<security:password-encoder hash="bcrypt" />
+		</security:authentication-provider>
+	</security:authentication-manager>
+
+</beans>

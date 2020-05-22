@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ExamDAO">
+	<!-- 190703 재홍 CRUD 쿼리 입력 -->
+	<!-- 시험 등록 -->
+	<!-- 2019.07.09 성재민 -->
+	<!-- #{disclosureStatus} #{setExamStatus} 추가 -->
+	<!-- 2019.07.11 성재민 -->
+	<!-- 입력시 id 값은 시퀀스로 지정 -->
+	<!-- 2019.07.11 성재민 -->
+	<!-- 시험 설명(심플(EXAM_DESCRIPTION_SIMPLE), 디테일(EXAM_DESCRIPTION_DETAIL) ) 추가 -->
+	<insert id="insertExam" parameterType="ExamVO">
+		INSERT INTO EXAM (	
+							EXAM_ID
+						,	EXAM_START_TIME
+						,	EXAM_END_TIME
+						,	QUESTION_QUANTITY
+						,	ESTIMATE_ID
+						,	NUMBER_OF_TIMES
+						,	PASSING_SCORE
+						,	APPLICANTS
+						,	EXAM_NAME
+						,	EXAM_STATUS				<!-- 시험상태 -->
+						,	DISCLOSURE_STATUS		<!-- 공개여부 -->
+						,	SET_EXAM_STATUS			<!-- 응시상태 -->
+						,	EXAM_DESCRIPTION_SIMPLE
+						,	EXAM_DESCRIPTION_DETAIL
+					)
+		VALUES ( 
+					EXAM_ID_SEQ.NEXTVAL
+				,	TO_DATE(#{examStartTime}, 'YYYY-MM-DD HH24:MI')
+				,	TO_DATE(#{examEndTime}, 'YYYY-MM-DD HH24:MI')
+				,	#{questionQuantity}
+				,	#{estimateId}
+				,	#{numberOfTimes}
+				,	#{passingScore}
+				,	#{applicants}
+				,	#{examName}
+				,	'D1'
+				,	#{disclosureStatus} 
+				,	'I1'
+				,	#{examDescriptionSimple} 
+				,	#{examDescriptionDetail} 
+			)
+	</insert>
+	
+	<!-- 2019.07.09 성재민 -->
+	<!-- 업데이트 추가 -->
+	<update id="updateExam" parameterType="ExamVO">
+		UPDATE EXAM
+		<set>
+			<if test="examStartTime != null and examStartTime != '' ">	
+			 EXAM_START_TIME   			= TO_DATE(#{examStartTime}, 'YYYY-MM-DD HH24:MI:SS')
+			</if>
+			<if test="examEndTime != null and examEndTime != '' ">	
+			, EXAM_END_TIME				= TO_DATE(#{examEndTime}, 'YYYY-MM-DD HH24:MI:SS')
+			</if>
+			<if test="questionQuantity != null and questionQuantity != '' ">
+			, QUESTION_QUANTITY 		= #{questionQuantity}
+			</if>
+			<if test="numberOfTimes != null and numberOfTimes != '' ">
+			, NUMBER_OF_TIMES 			= #{numberOfTimes}
+			</if>
+			<if test="passingScore != null and passingScore != '' ">
+			, PASSING_SCORE 			= #{passingScore}
+			</if>
+			<if test="applicants != null and applicants != '' ">
+			, APPLICANTS 		= #{applicants}
+			</if>
+			<if test="examStatus != null and examStatus != '' ">
+			, EXAM_STATUS 				= #{examStatus}
+			</if>
+			<if test="disclosureStatus != null and disclosureStatus != '' ">
+			, DISCLOSURE_STATUS 		= #{disclosureStatus}
+			</if>
+			<if test="setExamStatus != null and setExamStatus != '' ">
+			, SET_EXAM_STATUS 			= #{setExamStatus}
+			</if>
+			<if test="examDescriptionSimple != null and examDescriptionSimple != '' ">
+			, EXAM_DESCRIPTION_SIMPLE 	= #{examDescriptionSimple}
+			</if>
+			<if test="examDescriptionDetail != null and examDescriptionDetail != '' ">
+			, EXAM_DESCRIPTION_DETAIL 	= #{examDescriptionDetail}
+			</if>
+			
+		</set>
+		<where>
+			EXAM_ID = #{examId}
+		</where>
+	</update>
+	
+	<!-- 2019.07.09 성재민 -->
+	<!-- 삭제 추가 -->
+	<delete id="deleteExam" parameterType="ExamVO">
+		DELETE FROM EXAM
+		<where>
+			EXAM_ID = #{examId}
+		</where>
+	</delete>
+	
+	<!-- 2019.07.09 성재민 -->
+	<!-- select 추가 -->
+	<!-- 2019.07.11 성재민 -->
+	<!-- vo 객체의 변수타입이 문자열로 변경되어 TO_CHAR 로 변환 추가 -->
+	<select id="getExam" resultType="ExamVO">
+		SELECT 
+				EXAM_ID
+			,	TO_CHAR(EXAM_START_TIME, 'YYYY-MM-DD HH24:MI')	"examStartTime"
+			,	TO_CHAR(EXAM_END_TIME, 'YYYY-MM-DD HH24:MI')	"examEndTime"
+			,	QUESTION_QUANTITY
+			,	ESTIMATE_ID										"estimateId"						
+			,	NUMBER_OF_TIMES
+			,	PASSING_SCORE
+			,	APPLICANTS
+			,	EXAM_NAME
+			,	EXAM_STATUS
+			,	DISCLOSURE_STATUS
+			,	SET_EXAM_STATUS
+			,	EXAM_DESCRIPTION_SIMPLE
+			,	EXAM_DESCRIPTION_DETAIL
+		FROM EXAM
+		<where>
+			EXAM_ID = #{examId}
+		</where>
+		ORDER BY EXAM_ID DESC
+		
+	</select>
+	
+	<select id="getExamTaker" parameterType="ExamVO" resultType="map">
+		SELECT  t.TAKER_ID																"takerId"
+		        ,TAKER_NAME																"takerName"
+		        , NVL(TO_CHAR(te.TAKE_EXAM_DATE,'YYYY-MM-DD hh24:mm'),'미 응시자')			"takeExamDate"
+		        , NVL(te.SCORE,9999)													"score"
+		FROM    TAKER t JOIN    TAKE_EXAM te
+		ON      t.TAKER_ID = te.TAKER_ID
+		WHERE   te.EXAM_ID = #{examId}
+	</select>
+	
+	<!-- 2019.07.11 성재민 -->
+	<!-- vo 객체의 변수타입이 문자열로 변경되어 TO_CHAR 로 변환 추가 -->
+	<select id="getExamList" parameterType="CompanyVO" resultType="ExamVO">
+		SELECT B.* FROM( SELECT A.*, ROWNUM RN FROM (
+		SELECT 
+				EXAM.EXAM_ID
+			,	TO_CHAR(EXAM.EXAM_START_TIME, 'YYYY-MM-DD HH24:MI')	"examStartTime"
+			,	TO_CHAR(EXAM.EXAM_END_TIME, 'YYYY-MM-DD HH24:MI')	"examEndTime"
+			,	EXAM.QUESTION_QUANTITY
+			,	EXAM.ESTIMATE_ID
+			,	EXAM.NUMBER_OF_TIMES
+			,	EXAM.PASSING_SCORE
+			,	EXAM.APPLICANTS
+			,	EXAM.EXAM_NAME
+			,	EXAM.EXAM_STATUS
+			,	EXAM.DISCLOSURE_STATUS
+			,	EXAM.SET_EXAM_STATUS
+			,	EXAM.EXAM_DESCRIPTION_SIMPLE
+			,	EXAM.EXAM_DESCRIPTION_DETAIL
+		FROM EXAM EXAM
+		JOIN ESTIMATE ESTIMATE
+		ON EXAM.ESTIMATE_ID = ESTIMATE.ESTIMATE_ID
+		
+		<where>
+			ESTIMATE.COMPANY_ID = #{companyId}
+		</where>
+		
+		ORDER BY 2 DESC
+		) A ) B 
+		<where>
+		<if test = "start != null and start != ''">
+			<if test = "end != null and end != ''">
+				RN BETWEEN #{start} AND #{end}
+			</if>	
+		</if>
+			
+		</where>
+	</select>
+	
+	<!-- 2019.07.11 성재민 -->
+	<!-- vo 객체의 변수타입이 문자열로 변경되어 TO_CHAR 로 변환 추가 -->
+	<!-- D2(시험중) D3(시험완료) -->
+	<select id="getCompleteExamList" parameterType="CompanyVO" resultType="ExamVO">
+		SELECT 
+				EXAM_ID
+			,	TO_CHAR(EXAM_START_TIME, 'YYYY-MM-DD HH24:MI')	"examStartTime"
+			,	TO_CHAR(EXAM_END_TIME, 'YYYY-MM-DD HH24:MI')	"examEndTime"
+			,	QUESTION_QUANTITY
+			,	EXAM.ESTIMATE_ID
+			,	NUMBER_OF_TIMES
+			,	PASSING_SCORE
+			,	EXAM.APPLICANTS
+			,	EXAM_NAME
+			,	EXAM_STATUS
+			,	DISCLOSURE_STATUS
+			,	SET_EXAM_STATUS
+			,	EXAM_DESCRIPTION_SIMPLE
+			,	EXAM_DESCRIPTION_DETAIL
+		FROM EXAM
+		JOIN ESTIMATE
+		ON EXAM.ESTIMATE_ID = ESTIMATE.ESTIMATE_ID
+		<where>
+			ESTIMATE.COMPANY_ID = #{companyId}
+			AND (EXAM_STATUS = 'D2' OR EXAM_STATUS = 'D1' OR EXAM_STATUS = 'D3')
+		</where>
+		ORDER BY EXAM_START_TIME ASC
+	</select>
+	
+	<select id="getExamCount" resultType="int">
+		SELECT COUNT(*)
+		FROM EXAM
+	</select>
+	
+	<select id="getExamCompanyCount" resultType="int">
+		SELECT COUNT(*)
+		FROM EXAM EXAM JOIN ESTIMATE ESTIMATE
+        ON EXAM.ESTIMATE_ID = ESTIMATE.ESTIMATE_ID
+        
+        <where>
+      			ESTIMATE.COMPANY_ID = #{companyId} <!-- 접속한 기업의 정보만 가져올수있도록 세션처리를 위함 -->
+     	</where>
+	
+	</select>
+	
+	<!-- TEMP..설문통계용 -->
+	<select id="getExamSurveyList" parameterType="ManagerVO" resultType="SurveyVO">
+		SELECT '난이도' "q0", SUM(DECODE(Q1, '1', 1, 0)) "q1", SUM(DECODE(Q1, '2', 1, 0)) "q2", SUM(DECODE(Q1, '3', 1, 0)) "q3" , SUM(DECODE(Q1, '4', 1, 0)) "q4",SUM(DECODE(Q1, '5', 1, 0)) "q5"
+		FROM SURVEY
+		UNION ALL
+		SELECT '출제방향성' "q0",SUM(DECODE(Q2, '1', 1, 0)) "q1", SUM(DECODE(Q2, '2', 1, 0)) "q2", SUM(DECODE(Q2, '3', 1, 0)) "q3" , SUM(DECODE(Q2, '4', 1, 0)) "q4",SUM(DECODE(Q2, '5', 1, 0)) "q5"
+		FROM SURVEY
+		UNION ALL
+		SELECT '시험시간' "q0",SUM(DECODE(Q3, '1', 1, 0)) "q1", SUM(DECODE(Q3, '2', 1, 0)) "q2", SUM(DECODE(Q3, '3', 1, 0)) "q3" , SUM(DECODE(Q3, '4', 1, 0)) "q4",SUM(DECODE(Q3, '5', 1, 0)) "q5"
+		FROM SURVEY
+		UNION ALL
+		SELECT '서버안정성' "q0",SUM(DECODE(Q4, '1', 1, 0)) "q1", SUM(DECODE(Q4, '2', 1, 0)) "q2", SUM(DECODE(Q4, '3', 1, 0)) "q3" , SUM(DECODE(Q4, '4', 1, 0)) "q4",SUM(DECODE(Q4, '5', 1, 0)) "q5"
+		FROM SURVEY
+		UNION ALL
+		SELECT '재방문의사' "q0",SUM(DECODE(Q5, '1', 1, 0)) "q1", SUM(DECODE(Q5, '2', 1, 0)) "q2", SUM(DECODE(Q5, '3', 1, 0)) "q3" , SUM(DECODE(Q5, '4', 1, 0)) "q4",SUM(DECODE(Q5, '5', 1, 0)) "q5"
+		FROM SURVEY
+		UNION ALL
+		SELECT '주변홍보' "q0",SUM(DECODE(Q6, '1', 1, 0)) "q1", SUM(DECODE(Q6, '2', 1, 0)) "q2", SUM(DECODE(Q6, '3', 1, 0)) "q3" , SUM(DECODE(Q6, '4', 1, 0)) "q4",SUM(DECODE(Q3, '5', 1, 0)) "q5"
+		FROM SURVEY
+		UNION ALL
+		SELECT '목표성취도' "q0",SUM(DECODE(Q7, '1', 1, 0)) "q1", SUM(DECODE(Q7, '2', 1, 0)) "q2", SUM(DECODE(Q7, '3', 1, 0)) "q3" , SUM(DECODE(Q7, '4', 1, 0)) "q4",SUM(DECODE(Q7, '5', 1, 0)) "q5"
+		FROM SURVEY
+		UNION ALL
+		SELECT '준비기간' "q0",SUM(DECODE(Q8, '1', 1, 0)) "q1", SUM(DECODE(Q8, '2', 1, 0)) "q2", SUM(DECODE(Q8, '3', 1, 0)) "q3" , SUM(DECODE(Q8, '4', 1, 0)) "q4",SUM(DECODE(Q8, '5', 1, 0)) "q5"
+		FROM SURVEY
+		UNION ALL
+		SELECT '지출금액' "q0",SUM(DECODE(Q9, '1', 1, 0)) "q1", SUM(DECODE(Q9, '2', 1, 0)) "q2", SUM(DECODE(Q9, '3', 1, 0)) "q3" , SUM(DECODE(Q9, '4', 1, 0)) "q4",SUM(DECODE(Q9, '5', 1, 0)) "q5"
+		FROM SURVEY
+		
+	</select>
+	
+	
+	<select id="mainExamList" resultType="ExamVO">
+		SELECT B.* FROM (SELECT A.* , ROWNUM RN FROM (
+				SELECT 				
+			COMPANY.COMPANY_ID				
+		  , EXAM.EXAM_NAME
+		  , FIND_CODENM(EXAM_STATUS) AS EXAM_STATUS_NAME					
+		FROM EXAM 
+        JOIN ESTIMATE ON EXAM.ESTIMATE_ID = ESTIMATE.ESTIMATE_ID
+		JOIN COMPANY ON COMPANY.COMPANY_ID = ESTIMATE.COMPANY_ID
+		
+			<![CDATA[
+			) A ) B WHERE RN >= #{start} AND RN <=#{end}
+			]]>
+	
+	</select>
+</mapper>

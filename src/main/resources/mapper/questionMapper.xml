@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 2019.06.28 김재용 -->
+<!-- Question 관련 dao 처리 -->
+<mapper namespace="QuestionDAO">
+
+	<!-- <parameterMap type="java.util.HashMap" id="examAnswer">
+		<parameter property="v_take_exam_id" jdbcType="NUMBER" mode="IN"/>
+		<parameter property="v_check_refcur" jdbcType="CURSOR" mode="OUT" resultMap="resultMap"/>
+	</parameterMap> -->
+	
+	<resultMap type="QuestionVO" id="beanResult">
+		<result property="takeExamId" column="TAKE_EXAM_ID" javaType="int"/>
+		<result property="examName" column="EXAM_NAME" javaType="string"/>
+		<result property="takerName" column="TAKER_NAME" javaType="string"/>
+		<result property="examId" column="EXAM_ID" javaType="int"/>
+		<result property="passingScore" column="PASSING_SCORE" javaType="int"/>
+		<result property="sumPoint" column="sum(s.POINT)" javaType="int" />
+		<result property="count" column="count(*)" javaType="int" />
+		<result property="getPoint" column="POINT" javaType="int" />
+	</resultMap>
+	
+	<resultMap type="QuestionVO" id="questionVO">
+		<result property="questionContent" column="QUESTION_CONTENT" javaType="string" />
+		<result property="questionId" column="QUESTION_ID" javaType="int" />
+		<result property="example1" column="EXAMPLE_1" javaType="string" />
+		<result property="example2" column="EXAMPLE_2" javaType="string" />
+		<result property="example3" column="EXAMPLE_3" javaType="string" />
+		<result property="example4" column="EXAMPLE_4" javaType="string" />
+		<result property="rightAnswer" column="RIGHT_ANSWER" javaType="string" />
+		<result property="takerAnswer" column="TAKER_ANSWER" javaType="string" />
+		<result property="rightCommentary" column="RIGHT_COMMENTARY" javaType="string" />
+		<result property="setExamQuestionId" column="SET_EXAM_QUESTION_ID" javaType="string" />
+		<result property="point" column="POINT" javaType="int" />
+		<result property="examId" column="EXAM_ID" javaType="int" />
+		<result property="count" column="count(*)" javaType="int" />
+		<result property="levelOfDifficulty" column="LEVEL_OF_DIFFICULTY" javaType="int" />
+		<result property="categoryId" column="CATEGORY_ID" javaType="int" />
+		<result property="score" column="SCORE" javaType="int" />
+		<result property="questionType" column="QUESTION_TYPE" javaType="string" />
+	</resultMap>
+	
+	<resultMap type="QuestionVO" id="questionVOs">
+		<result property="takeExamId" column="TAKE_EXAM_ID" javaType="int"/>
+		<result property="examName" column="EXAM_NAME" javaType="string"/>
+		<result property="passingScore" column="PASSING_SCORE" javaType="int"/>
+		<result property="examStartTime" column="EXAM_START_TIME" javaType="String"/>
+		<result property="takerScore" column="TAKER_SCORE" javaType="int"/>
+		<result property="takerName" column="TAKER_NAME" javaType="string"/>
+		<result property="takerInfo" column="TAKER_INFO" javaType="string"/>
+		<result property="examId" column="EXAM_ID" javaType="int"/>
+		<result property="score" column="SCORE" javaType="int"/>
+		<result property="takerId" column="TAKER_ID" javaType="string"/>
+	</resultMap>
+	
+	
+	<!-- <select id="getTestList" statementType="CALLABLE">
+		<![CDATA[
+			{
+				call TEST_ANSWER_PKG.TEST_ANSWER_RESULT_PRO(
+					#{takeExamId, mode=IN, jdbcType=NUMERIC, javaType=int}, 
+					#{result, mode=OUT, jdbcType=CURSOR, javaType=java.sql.ResultSet, resultMap=beanResult}
+				)
+			}
+		]]>
+	</select> -->
+	
+	<select id="getTestResultList" resultMap="beanResult">					<!-- 리턴값 받을땐 리절타입 -->
+		SELECT 	t.TAKE_EXAM_ID,  
+				e.EXAM_NAME, 
+				c.TAKER_NAME, 
+				e.EXAM_ID, 
+				e.PASSING_SCORE, 
+				SUM(s.POINT),
+				COUNT(*)
+                        FROM  EXAM e JOIN SET_EXAM_QUESTION s
+                        ON e.EXAM_ID = s.EXAM_ID JOIN TAKE_EXAM_HISTORY t
+                        ON s.SET_EXAM_QUESTION_ID = t.SET_EXAM_QUESTION_ID JOIN TAKER c
+                        ON t.TAKER_ID = c.TAKER_ID JOIN QUESTION q
+                        ON s.QUESTION_ID = q.QUESTION_ID
+                        WHERE s.question_id = q.question_id AND t.TAKER_ANSWER = q.RIGHT_ANSWER AND t.TAKE_EXAM_ID = #{takeExamId}
+                        GROUP BY t.TAKE_EXAM_ID, e.EXAM_NAME, c.TAKER_NAME, e.EXAM_ID, e.PASSING_SCORE
+	</select>
+	
+	<select id="candidateRightAnswerList" resultType="map">
+		SELECT 	q.QUESTION_CONTENT					"questionContent"
+				,q.QUESTION_ID						"questionId"
+				,q.EXAMPLE_1						"example1"
+				,q.EXAMPLE_2						"example2"
+				,q.EXAMPLE_3						"example3"
+				,q.EXAMPLE_4						"example4"
+				,q.RIGHT_ANSWER						"rightAnswer"
+				,q.RIGHT_COMMENTARY					"rightCommentary"
+				,s.SET_EXAM_QUESTION_ID				"setExamQuestionId"
+				,s.POINT							"point"
+				,s.EXAM_ID							"examId"
+				,th.TAKER_ANSWER					"takerAnswer"
+		FROM    QUESTION q JOIN SET_EXAM_QUESTION s
+		ON      q.QUESTION_ID 				= 	s.QUESTION_ID JOIN TAKE_EXAM_HISTORY th
+		ON      th.SET_EXAM_QUESTION_ID 	= 	s.SET_EXAM_QUESTION_ID
+		WHERE   th.TAKER_ID					=	#{takerId}
+		AND     s.EXAM_ID					=	#{examId}
+	</select>
+	
+	<select id="getTestStart" resultType="map">
+		SELECT	q.QUESTION_ID					"questionId"
+				,s.SET_EXAM_QUESTION_ID			"setExamQuestionId"
+				,q.EXAMPLE_1					"example1"
+				,q.EXAMPLE_2					"example2"
+				,q.EXAMPLE_3					"example3"
+				,q.EXAMPLE_4					"example4"
+				,t.TAKER_ANSWER					"takerAnswer"
+				,q.RIGHT_COMMENTARY				"rightCommentary"
+				,q.QUESTION_CONTENT				"questionContent"
+				,s.POINT						"point"
+				,s.EXAM_ID						"examId"
+		FROM 	SET_EXAM_QUESTION s JOIN QUESTION q 
+		ON		q.QUESTION_ID = s.QUESTION_ID JOIN TAKE_EXAM_HISTORY t
+		ON		t.SET_EXAM_QUESTION_ID = s.SET_EXAM_QUESTION_ID
+		WHERE	t.TAKE_EXAM_ID = #{takeExamId} and s.EXAM_ID = #{examId}
+	</select>
+	
+	<select id="getHistoryCount" resultType="int">
+		SELECT COUNT(EXAM_ID)
+		FROM   EXAM 
+		WHERE  QUESTION_QUANTITY = NVL((SELECT COUNT(*)
+			                            FROM   TAKE_EXAM_HISTORY
+			                            WHERE  TAKE_EXAM_ID = #{takeExamId}),0)
+	</select>
+	
+	<insert id="insertTakeExamHistory" parameterType="QuestionVO">
+		insert into TAKE_EXAM_HISTORY (	TAKER_ID,
+										TAKE_EXAM_HISTORY_ID,
+										SET_EXAM_QUESTION_ID,
+										TAKE_EXAM_ID	)
+
+				SELECT  	t.TAKER_ID, 
+							TAKE_EXAM_HISTORY_ID_SEQ.NEXTVAL, 
+							s.SET_EXAM_QUESTION_ID,
+							t.TAKE_EXAM_ID
+							
+				FROM    TAKE_EXAM t JOIN SET_EXAM_QUESTION s
+				
+				ON t.EXAM_ID = s.EXAM_ID
+				
+				WHERE t.TAKE_EXAM_ID = #{takeExamId}
+	</insert>
+	
+	<update id="updateTakeExamHistory" parameterType="QuestionVO">
+		UPDATE	TAKE_EXAM_HISTORY
+		SET		TAKER_ANSWER = #{takerAnswer}
+		WHERE	TAKE_EXAM_ID = #{takeExamId} AND TAKER_ID = #{takerId} AND SET_EXAM_QUESTION_ID = #{setExamQuestionId}
+	</update>
+	
+	<select id="candidateExaminationList" resultType="map">
+		SELECT 	e.PASSING_SCORE									"passingScore"
+				,e.EXAM_NAME									"examName"
+				,TO_CHAR(e.EXAM_START_TIME,'yyyy/mm/dd hh:mi')	"examStartTime"
+				,t.TAKE_EXAM_ID									"takeExamId"
+				,e.EXAM_ID										"examId"
+				,NVL(t.SCORE,9999)								"score"
+				
+		FROM 	EXAM e JOIN TAKE_EXAM t
+		ON 		e.EXAM_ID = t.EXAM_ID
+		WHERE 	t.TAKER_ID = #{takerId} AND t.SCORE IS NOT NULL
+	</select>
+	
+	<!-- 2019.07.17 성재민 -->
+	<!-- 검색에 th.TAKE_EXAM_ID 추가 -->
+	<select id="candidateExaminationListDetail" resultType="map">
+		SELECT 	DISTINCT
+        		t.SCORE											"score"
+        		,e.EXAM_ID										"examId"
+				,u.TAKER_NAME									"takerName"
+				,u.TAKER_INFO									"takerInfo"
+				,e.EXAM_NAME									"examName"
+				,th.TAKE_EXAM_ID								"takeExamId"
+				,TO_CHAR(e.EXAM_START_TIME,'yyyy/mm/dd hh:mi')	"examStartTime"
+				,e.PASSING_SCORE								"passingScore"
+				
+		FROM 	TAKE_EXAM_HISTORY th 						JOIN 	TAKE_EXAM t
+		ON 		th.TAKE_EXAM_ID 	= 	t.TAKE_EXAM_ID 		JOIN 	EXAM e
+		ON 		e.EXAM_ID 			= 	t.EXAM_ID 			JOIN 	TAKER u
+		ON 		u.TAKER_ID 			= 	th.TAKER_ID
+		WHERE 	t.TAKE_EXAM_ID 	= #{takeExamId} 		AND 	t.TAKER_ID = #{takerId}
+	</select>
+	
+	<update id="rightAnswer" parameterType="int">
+		UPDATE	TAKE_EXAM_HISTORY t
+		SET 	TAKER_SCORE 		= 		NVL((	SELECT 	POINT
+        											FROM	SET_EXAM_QUESTION s 
+        											JOIN 	QUESTION q
+        											ON 		q.QUESTION_ID 		= 		s.QUESTION_ID
+       												 WHERE 	s.SET_EXAM_QUESTION_ID 	= 	t.SET_EXAM_QUESTION_ID 
+       												 AND 	t.TAKER_ANSWER 		= 		q.RIGHT_ANSWER),0)
+
+		WHERE 	TAKE_EXAM_ID 		= 	#{takeExamId}
+	</update>
+	
+	<update id="rightLastAnswer" parameterType="TakeExamVO">
+		UPDATE	TAKE_EXAM
+		
+	    SET		SCORE		=	(SELECT 	NVL(sum(POINT),0)  
+	    
+							    FROM		SET_EXAM_QUESTION s							JOIN	QUESTION q
+							    
+							    ON 			q.QUESTION_ID			=	s.QUESTION_ID	JOIN	TAKE_EXAM_HISTORY t
+							    
+							    ON			s.SET_EXAM_QUESTION_ID	=	t.SET_EXAM_QUESTION_ID
+							    
+							    WHERE		q.RIGHT_ANSWER			=	t.TAKER_ANSWER
+							    
+								AND			TAKE_EXAM_ID 			= 	#{takeExamId})   
+		
+	    WHERE   TAKE_EXAM_ID = #{takeExamId}
+	</update>
+	
+	<!-- 2019.07.17 김재용 -->
+	<!-- 응시자 ID 로 시험결과 제출한지 안한지 체크 -->
+	<select id="takeExamScoreNullCheck" resultType="int">
+		SELECT  NVL((SCORE),9999) SCORE
+		FROM    TAKE_EXAM
+		WHERE   TAKE_EXAM_ID = #{takeExamId}
+	</select>
+	
+	<select id="managerAllQuestionList" resultMap="questionVO">
+		SELECT  QUESTION_ID,
+		        QUESTION_CONTENT,
+		        EXAMPLE_1,
+		        EXAMPLE_2,
+		        EXAMPLE_3,
+		        EXAMPLE_4,
+		        RIGHT_ANSWER,
+		        RIGHT_COMMENTARY,
+		        LEVEL_OF_DIFFICULTY,
+		        CATEGORY_ID,
+		        QUESTION_TYPE
+		
+		FROM 	QUESTION
+	</select>
+	
+	<insert id="insertFileUpload" parameterType="QuestionVO">
+
+		insert into QUESTION (			QUESTION_ID				,
+										QUESTION_CONTENT		"questionContent",
+										EXAMPLE_1				"example1",
+										EXAMPLE_2				"example2",
+										EXAMPLE_3				"example3",
+										EXAMPLE_4				"example4",
+										RIGHT_ANSWER			"rightAnswer",
+										RIGHT_COMMENTARY		"rightCommentary",
+										LEVEL_OF_DIFFICULTY		"levelOfDifficulty",
+										CATEGORY_ID				"categoryId",
+										QUESTION_TYPE			"questionType"	)
+
+		values		QUESTION_ID_SEQ.NEXTVAL,
+					#{questionContent},
+					#{example1},
+					#{example2},
+					#{example3},
+					#{example4},
+					#{rightAnswer},
+					#{rightCommentary},
+					#{levelOfDifficulty},
+					#{categoryId},
+					#{questionType})
+				
+	</insert>
+	
+	<insert id="insertQuestion" parameterType="QuestionVO">
+		INSERT INTO QUESTION (
+			QUESTION_ID, 
+			QUESTION_CONTENT, 
+			EXAMPLE_1, 
+			EXAMPLE_2, 
+			EXAMPLE_3, 
+			EXAMPLE_4, 
+			RIGHT_ANSWER, 
+			RIGHT_COMMENTARY, 
+			LEVEL_OF_DIFFICULTY, 
+			CATEGORY_ID, 
+			QUESTION_TYPE) 
+		VALUES (
+			QUESTION_ID_SEQ.NEXTVAL,
+			#{questionContent},
+			#{example1},
+			#{example2},
+			#{example3},
+			#{example4},
+			#{rightAnswer},
+			#{rightCommentary},
+			#{levelOfDifficulty},
+			#{categoryId},
+			#{questionType})
+	</insert>
+	
+	<select id="selectExamName" resultType="QuestionVO">
+		SELECT	EXAM_NAME, 
+				PASSING_SCORE, 
+				TO_NUMBER(TO_CHAR(EXAM_START_TIME, 'YYMMDDHH24MI')) EXAM_START_TIME
+		FROM	EXAM 
+		WHERE	EXAM_ID = #{examId}
+	</select>
+	
+	<!-- 2019.07.15 성재민 -->
+	<!-- 문제 id 로 문제 찾는 쿼리 -->
+	<select id="getQuestion" resultType="questionVO">
+		SELECT  QUESTION_ID,
+			        QUESTION_CONTENT,
+			        EXAMPLE_1,
+			        EXAMPLE_2,
+			        EXAMPLE_3,
+			        EXAMPLE_4,
+			        RIGHT_ANSWER,
+			        RIGHT_COMMENTARY,
+			        LEVEL_OF_DIFFICULTY,
+			        CATEGORY_ID,
+			        QUESTION_TYPE
+			
+			FROM 	QUESTION
+			<where>
+				QUESTION_ID = #{questionId}
+			</where>
+	</select>
+	
+	<select id="getQuestionSetList" resultType="map">
+		SELECT	q.QUESTION_ID					"questionId"
+				,s.SET_EXAM_QUESTION_ID			"setExamQuestionId"
+				,q.EXAMPLE_1					"example1"
+				,q.EXAMPLE_2					"example2"
+				,q.EXAMPLE_3					"example3"
+				,q.EXAMPLE_4					"example4"
+				,q.RIGHT_COMMENTARY				"rightCommentary"
+				,q.QUESTION_CONTENT				"questionContent"
+				,s.POINT						"point"
+				,s.EXAM_ID						"examId"
+		FROM 	SET_EXAM_QUESTION s JOIN QUESTION q 
+		ON		q.QUESTION_ID = s.QUESTION_ID
+		WHERE	s.EXAM_ID = #{value}
+	</select>
+	
+	
+	
+</mapper>
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 

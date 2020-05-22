@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="inquiryDAO">
+	<!-- 2019.07.20 성재민 -->
+	<!-- 문의 관련 sql 작성 -->
+	<insert id="insertInquiry">
+		INSERT INTO INQUIRY(
+				INQUIRY_ID 
+			, 	INQUIRY_TAKER_ID
+			, 	REPLY_STATUS
+			, 	INQUIRY_CONTENT
+			, 	INQUIRY_ROOM_ID
+			,	INQUIRY_TIME
+		) 
+		VALUES (
+				INQUIRY_ID_SEQ.NEXTVAL
+			, 	#{inquiryTakerId}
+			, 	'처리전'
+			, 	#{inquiryContent}
+			, 	#{inquiryRoomId}
+			, 	LOCALTIMESTAMP
+		)
+	</insert>
+	
+	<!-- 2019.07.22 성재민 -->
+	<!-- 문의 수정 -->
+	<update id="updateInquiry" parameterType="InquiryVO">
+		UPDATE INQUIRY 
+		<set>
+			REPLY_STATUS 		= #{replyStatus}
+		</set>
+		<where>
+			INQUIRY_ROOM_ID 	= #{inquiryRoomId}
+		</where>		
+	</update>
+	
+	<!-- 2019.07.22 성재민 -->
+	<!-- 문의 삭제 -->
+	<delete id="deleteInquiry" parameterType="InquiryVO">
+		DELETE FROM INQUIRY
+		<where>
+			INQUIRY_ROOM_ID = #{inquiryRoomId}
+		</where>
+	</delete>
+	
+	<select id="getBeforeReplyCount" resultType="int">
+		SELECT COUNT(INQUIRY_ID) 
+		FROM INQUIRY
+		<where>
+			REPLY_STATUS = '처리전'
+		</where>
+	</select>
+	
+	<select id="getBeforeReplyList" resultType="InquiryVO">
+		SELECT DISTINCT
+				INQUIRY_ID
+			, 	INQUIRY_TAKER_ID
+			, 	REPLY_STATUS			
+			, 	INQUIRY_CONTENT
+			, 	INQUIRY_ROOM_ID
+			, 	INQUIRY_TIME
+		FROM INQUIRY
+		<where>
+			REPLY_STATUS = '처리전'
+		</where>
+		ORDER BY INQUIRY_ID
+	</select>
+</mapper>

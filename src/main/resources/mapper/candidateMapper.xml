@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 2019.06.28 김재용 -->
+<!-- candidate 관련 dao 처리 -->
+<mapper namespace="candidateDAO">
+		<!-- 6/28 candidate 더미 쿼리       김재용 -->
+		<select id="selectCandidate" resultType="CandidateVO">
+			SELECT 1 FROM DUAL
+		</select>
+		
+		<!-- 7/1 candidate Insert     장세준  -->
+		<insert id="insertCandidate" parameterType="CandidateVO">
+		INSERT INTO TAKER (TAKER_ID
+						   , TAKER_NAME
+						   , TAKER_INFO
+						   , TAKER_EDUCATION
+						   , TAKER_EMAIL
+						   , TAKER_PASSWORD
+						   , TAKER_PHONENUM) 
+		VALUES (  #{takerId}
+				 ,#{takerName}
+				 ,#{takerInfo}
+				 ,#{takerEducation}
+ 				 ,#{takerEmail}
+				 ,#{takerPassword}
+				 ,#{takerPhoneNum} )
+		</insert>
+		
+		<!-- 7/26 KAKAO candidate Insert     장세준  -->
+		<insert id="insertKakaoCandidate" parameterType="CandidateVO">
+		INSERT INTO TAKER (TAKER_ID
+						   , TAKER_NAME
+						   , TAKER_INFO
+						   , TAKER_EDUCATION
+						   , TAKER_EMAIL
+						   , TAKER_PASSWORD
+						   , TAKER_PHONENUM) 
+		VALUES (  #{takerId}
+				 ,#{takerName}
+				 ,0
+				 ,'J1'
+ 				 ,0
+				 ,0
+				 ,0 )
+		</insert>
+		
+		<!-- 7/2 	단건 조회 	장세준  -->
+		<select id="getCandidate" resultType="CandidateVO">
+			SELECT	TAKER_ID
+					, TAKER_NAME
+					, TAKER_INFO
+					, TAKER_EDUCATION
+					, TAKER_EDUCATION 
+					, TAKER_EMAIL
+					, TAKER_PASSWORD
+					, TAKER_PHONENUM
+			FROM 	TAKER
+			WHERE	TAKER_ID = #{takerId} 
+			<!-- AND TAKER_PASSWORD= #{takerPassword} -->
+		</select>
+		
+		<!-- 7/9 	시험목록조회 	장세준  -->
+		<select id="getExamList" resultType="map">
+			SELECT	EXAM.EXAM_ID									"examId"
+					,EXAM_NAME										"examName"
+					,TO_CHAR(EXAM_START_TIME, 'YYYY-MM-DD HH24:MI')	"examStartTime"
+				    ,TO_CHAR(EXAM_END_TIME, 'YYYY-MM-DD HH24:MI')	"examEndTime"
+				    ,QUESTION_QUANTITY								"questionQuantity"
+				    ,PASSING_SCORE									"passingScore"
+				    ,TAKER_ID										"takerId"
+				    ,EXAM_DESCRIPTION_SIMPLE						"examDescriptionSimple"
+				    ,EXAM_DESCRIPTION_DETAIL						"examDescriptionDetail"
+			FROM    EXAM, TAKE_EXAM
+			WHERE   EXAM.EXAM_ID = TAKE_EXAM.EXAM_ID
+			AND		TAKER_ID = #{takerId}
+			<!-- AND TAKER_PASSWORD= #{takerPassword} -->
+		</select>
+		
+		<!-- 7/12 	시험목록조회 	장세준  -->
+		<select id="candidateScheduleCheck" resultType="map">
+			SELECT	            EXAM_ID											
+								,EXAM_NAME										
+								,TO_CHAR(EXAM_START_TIME, 'YYYY-MM-DD HH24:MI')	EXAM_START_TIME
+							    ,TO_CHAR(EXAM_END_TIME, 'YYYY-MM-DD HH24:MI')	EXAM_END_TIME
+							    ,QUESTION_QUANTITY								
+							    ,PASSING_SCORE									
+							    ,EXAM_DESCRIPTION_SIMPLE						
+							    ,EXAM_DESCRIPTION_DETAIL						
+			FROM    			EXAM
+		</select>
+		
+		
+		<!-- 7/22 	조회기준변경 	장세준  (EXAM_START_TIME > SYSDATE -> EXAM_END_TIME > SYSDATE )-->
+		<!-- 7/15 	시험목록조회 	장세준  -->
+		<select id="candidateScheduleCheckPage" resultType="map">
+			SELECT B.* FROM( SELECT A.*, ROWNUM RN FROM (
+				SELECT	            EXAM_ID										
+									,EXAM_NAME										
+									,TO_CHAR(EXAM_START_TIME, 'YYYY-MM-DD HH24:MI')	EXAM_START_TIME
+								    ,TO_CHAR(EXAM_END_TIME, 'YYYY-MM-DD HH24:MI')	EXAM_END_TIME
+								    ,QUESTION_QUANTITY								
+								    ,PASSING_SCORE									
+								    ,EXAM_DESCRIPTION_SIMPLE						
+								    ,EXAM_DESCRIPTION_DETAIL	
+                                    ,DISCLOSURE_STATUS
+				FROM    			EXAM e JOIN ESTIMATE es
+                ON                  e.ESTIMATE_ID = es.ESTIMATE_ID
+				WHERE				EXAM_END_TIME > SYSDATE     
+                AND     es.TRADE_PROGRESS = 'B5' 
+                AND     DISCLOSURE_STATUS = 'O1' 
+                
+                <if test="takerId != null and takerId != '' "> 
+                
+                OR (DISCLOSURE_STATUS = 'O2' AND EXISTS (SELECT 1 
+                                                         FROM PRIVATE_EXAM 
+                                                         WHERE TAKER_ID = #{takerId} 
+                                                         AND EXAM_ID = e.EXAM_ID) )
+				</if>
+				
+				ORDER BY			e.EXAM_ID DESC
+				
+				 ) A ) B
+				<where>
+					RN BETWEEN #{start} AND #{end}
+				</where>
+		</select>
+		
+		
+		
+		
+		
+		<!-- 7/9 	로그인 	장세준  -->
+		<select id="candidateLogin" resultType="CandidateVO">
+			SELECT	TAKER_ID
+					, TAKER_NAME
+					, TAKER_INFO
+					, TAKER_EDUCATION
+					, TAKER_EMAIL
+					, TAKER_PASSWORD
+			FROM 	TAKER
+			WHERE	TAKER_ID = #{takerId} 
+					AND TAKER_PASSWORD= #{takerPassword}
+		</select>
+		
+
+		<!--  SECURITY 통합로그인 -->
+		<select id="commonLogin" resultType="CandidateVO">
+		SELECT *
+		  FROM (	SELECT TAKER_ID , TAKER_PASSWORD , 'ROLE_USER' ROLE_NAME
+					  FROM TAKER
+					 UNION ALL
+					SELECT MANAGER_ID, MANAGER_PASSWORD, 'ROLE_MANAGER' ROLE_NAME
+					  FROM MANAGER
+					 UNION ALL
+					SELECT COMPANY_ID , COMPANY_PASSWORD, 'ROLE_COMPANY' ROLE_NAME
+					  FROM COMPANY
+			    )
+			 WHERE TAKER_ID = #{takerId} 
+		</select>		
+		
+		<select id="getTakerPassword" resultType="String">
+			SELECT	TAKER_PASSWORD
+			FROM 	(	SELECT TAKER_ID , TAKER_PASSWORD , 'ROLE_USER' ROLE_NAME
+					  FROM TAKER
+					 UNION ALL
+					SELECT MANAGER_ID, MANAGER_PASSWORD, 'ROLE_MANAGER' ROLE_NAME
+					  FROM MANAGER
+					 UNION ALL
+					SELECT COMPANY_ID , COMPANY_PASSWORD, 'ROLE_COMPANY' ROLE_NAME
+					  FROM COMPANY
+			   		 )
+			WHERE	TAKER_ID = #{takerId} 
+		</select>
+		
+		<!-- 7/2 	응시자 전체 리스트 조회 	장세준  -->
+		<select id="getCandidateList" resultType="CandidateVO">
+		SELECT B.* FROM( SELECT A.*, ROWNUM RN FROM (
+			SELECT	TAKER_ID
+					, TAKER_NAME
+					, TAKER_INFO
+					, TAKER_EDUCATION
+					, TAKER_EMAIL
+					, TAKER_PASSWORD
+			FROM 	TAKER  ) A ) B
+			WHERE RN BETWEEN #{start} AND #{end}
+			
+		</select>
+		
+		<!-- 7/2 	candidate Update 	장세준  -->
+		<update id="updateCandidate">
+			UPDATE TAKER
+		<set>
+			<if test="takerPassword != null and takerPassword != '' ">
+				TAKER_PASSWORD = #{takerPassword},
+			</if>
+			<if test="takerName != null and takerName != '' ">
+				TAKER_NAME = #{takerName},
+			</if>
+			<if test="takerInfo != null and takerInfo != '' ">
+				TAKER_INFO = #{takerInfo},
+			</if>
+			<if test="takerEducation != null and takerEducation != '' "> 
+				TAKER_EDUCATION = #{takerEducation},
+			</if>
+			<if test="takerEmail != null and takerEmail != '' "> 
+				TAKER_EMAIL = #{takerEmail},
+			</if>
+			<if test="takerPhoneNum != null and takerPhoneNum != '' "> 
+				TAKER_PHONENUM = #{takerPhoneNum},
+			</if>
+		</set>
+		WHERE TAKER_ID = #{takerId}	
+	</update>
+		
+		<!-- 7/2 	candidate delete 	장세준  -->
+		<!-- <delete id="deleteCandidate" parameterType="CandidateVO">
+			DELETE	FROM TAKER
+			WHERE TAKER_ID = #{takerId}
+		</delete>
+		 -->
+		 
+		<!-- 단건, 다건 삭제 // 이승환추가 -->
+	<delete id="deleteCandidate" parameterType="CandidateVO">
+		DELETE FROM TAKER
+		<where>
+			<choose>
+				<when test="takerList != null and takerList">
+					TAKER_ID in
+					<foreach collection="takerList"
+							 open="(" close=")" separator=","
+							 item="item">
+							 #{item}
+					</foreach>
+				</when>
+				<otherwise>
+					TAKER_ID = #{takerId}
+				</otherwise>
+			</choose>
+		</where>
+	</delete>
+		
+	<select id="getCount" resultType="int">
+		SELECT COUNT(*) FROM TAKER
+	</select>
+	
+	<select id="examCount" resultType="int">
+		SELECT COUNT(EXAM_ID) FROM EXAM
+		WHERE  EXAM_END_TIME > SYSDATE
+	</select>
+	
+	<select id="idcheck" parameterType="CandidateVO" resultType="Integer">
+		SELECT 		COUNT(*)
+		  FROM (	SELECT TAKER_ID , TAKER_PASSWORD , 'ROLE_USER' ROLE_NAME
+					  FROM TAKER
+					 UNION ALL
+					SELECT MANAGER_ID, MANAGER_PASSWORD, 'ROLE_MANAGER' ROLE_NAME
+					  FROM MANAGER
+					 UNION ALL
+					SELECT COMPANY_ID , COMPANY_PASSWORD, 'ROLE_COMPANY' ROLE_NAME
+					  FROM COMPANY
+			    )
+		<where>
+			<choose>
+				<when test="companyId != null">
+					TAKER_ID = #{companyId}
+				</when>
+				<otherwise>
+					TAKER_ID = #{takerId}
+				</otherwise>
+			</choose>
+		</where>
+	</select>
+	
+	<!-- 07.17 이승환 추가 // 매니저 응시자목록 카운팅 -->
+	<select id="getManagerCandidateCount" resultType="int">
+		SELECT COUNT(*)
+		FROM TAKER
+	</select>
+	
+	<!-- 아이디 찾기 (7/29) 추가 ,june-->
+	<select id="findID" resultType="String">
+		SELECT RPAD(SUBSTR(TAKER_ID,1,3), LENGTH(TAKER_ID), '*')
+				  FROM (	SELECT TAKER_ID , TAKER_EMAIL , TAKER_NAME ,'ROLE_USER' ROLE_NAME
+							  FROM TAKER
+							 UNION ALL
+							SELECT COMPANY_ID , COMPANY_EMAIL, COMPANY_NAME,'ROLE_COMPANY' ROLE_NAME
+							  FROM COMPANY
+					    )
+		WHERE TAKER_NAME = #{takerName}  AND TAKER_EMAIL = #{takerEmail}  
+	</select>	
+	<!-- 이메일 중복 체크(7/30) 추가 ,june-->
+	<select id="emailcheck" parameterType="CandidateVO" resultType="Integer">
+		SELECT 		COUNT(*)
+		  FROM (	SELECT TAKER_ID , TAKER_EMAIL , 'ROLE_USER' ROLE_NAME
+					  FROM TAKER
+					 UNION ALL
+					SELECT COMPANY_ID , COMPANY_EMAIL, 'ROLE_COMPANY' ROLE_NAME
+					  FROM COMPANY
+			    )
+		WHERE		TAKER_EMAIL = #{takerEmail}
+	</select>
+	
+</mapper>

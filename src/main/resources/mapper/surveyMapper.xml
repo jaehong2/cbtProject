@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="SurveyDAO">
+	<!-- 190703 재홍 CRUD 쿼리 입력 -->
+	<!-- 설문조사 등록 -->
+	<insert id = "insertSurvey" parameterType="SurveyVO">
+		INSERT INTO SURVEY (  SURVEY_ID
+							, SURVEY_TYPE
+							, TAKE_EXAM_ID
+							,Q1
+							,Q2
+							,Q3
+							,Q4
+							,Q5
+							,Q6
+							,Q7
+							,Q8
+							,Q9 )
+		VALUES ( SURVEY_ID_SEQ.NEXTVAL
+				,#{surveyType}
+				,#{takeExamId}
+				,#{q1}
+				,#{q2}
+				,#{q3}
+				,#{q4}
+				,#{q5}
+				,#{q6}
+				,#{q7}
+				,#{q8}
+				,#{q9} )
+	</insert>
+	
+	<!-- 설문조사 수정 -->
+	<update id = "updateSurvey" parameterType="SurveyVO">
+		UPDATE SURVEY SET SURVEY_TYPE = #{surveyType}
+						, TAKE_EXAM_ID = #{takeExamId}
+		WHERE SURVEY_ID = #{surveyId}
+	</update>
+	
+	<!--설문조사 삭제 -->
+	<delete id = "deleteSurvey" parameterType="SurveyVO">
+		DELETE FROM SURVEY
+		WHERE SURVEY_ID = #{surveyId}
+	</delete>
+	
+	<!-- 설문조사 ID로 조회 -->
+	<select id="getSurveyID" resultType="SurveyVO">
+		SELECT 	 SURVEY_ID
+			   , SURVEY_TYPE
+			   , TAKE_EXAM_ID
+		FROM SURVEY
+		WHERE TAKE_EXAM_ID= #{takeExamId}
+		<!-- WHERE SURVEY_ID = #{surveyId} -->
+	</select>
+	
+	<!-- 설문조사를 examId로 조회하여 난이도 등 조회 (7/21, june) -->
+	<select id="getSurveyList" parameterType="SurveyVO" resultType="map">
+
+ 		SELECT	SURVEY_ID
+			   , SURVEY_TYPE
+			   , TAKE_EXAM_ID
+			   , EXAM_ID
+			   ,Q1
+			   ,Q2
+			   ,Q3
+			   ,Q4
+			   ,Q5
+			   ,Q6
+			   ,Q7
+			   ,Q8
+			   ,Q9 
+		FROM SURVEY JOIN EXAM
+		WHERE EXAM_ID = #{examId} 
+
+	</select>
+	
+</mapper>

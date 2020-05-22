@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="categoryMainDAO">
+	<!-- 2019.07.09 성재민 -->
+	<!-- insert 시 id 값 시퀀스 적용 -->
+	<!-- 2019.07.04 성재민 -->
+	<insert id="insertCategoryMain" parameterType="CategoryMainVO">
+		INSERT INTO CATEGORY_MAIN (	  
+				CATEGORY_MAIN_ID
+				,CATEGORY_MAIN_NAME
+			)
+		VALUES (  
+				CATEGORY_MAIN_SEQ.NEXTVAL
+				, #{categoryMainName}
+			)
+	</insert>
+	
+	<!-- 수정 -->
+	<update id="updateCategoryMain" parameterType="CategoryMainVO">
+		<if test="categoryMainName != null and categoryMainName != ''">	
+			UPDATE CATEGORY_MAIN
+			<set>
+				CATEGORY_MAIN_NAME = #{categoryMainName}
+			</set>
+			<where>
+				CATEGORY_MAIN_ID = #{categoryMainId}
+			</where>
+		</if>
+	</update>
+	
+	<!-- 삭제  -->
+	<delete id="deleteCategoryMain" parameterType="CategoryMainVO">
+		DELETE FROM CATEGORY_MAIN
+		<where>
+			CATEGORY_MAIN_ID = #{categoryMainId}
+		</where>
+	</delete>
+	
+	<!-- ID로 조회  -->
+	<select id="getCategoryMain" resultType="CategoryMainVO">
+		SELECT 
+			CATEGORY_MAIN_ID
+			,CATEGORY_MAIN_NAME
+		FROM CATEGORY_MAIN
+		<where>
+			CATEGORY_MAIN_ID = #{categoryMainId}
+		</where>
+	</select>
+	
+	<!-- 모든 조회 -->
+	<select id="getAllCategoryMain" resultType="CategoryMainVO">
+		SELECT 
+			CATEGORY_MAIN_ID
+			,CATEGORY_MAIN_NAME
+		FROM CATEGORY_MAIN
+	</select>
+</mapper>

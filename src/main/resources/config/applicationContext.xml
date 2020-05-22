@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+	xsi:schemaLocation="http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring-1.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd">
+
+
+	
+	<context:component-scan base-package="com.cbt" >
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+	</context:component-scan>
+	
+	<!-- 19/06/27 재홍 jdbc datasource 설정 -->
+	<bean id="dataSourceSpied"
+		class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="${jdbc.driver}"></property>
+		<property name="url" value="${jdbc.url}"></property>
+		<property name="username" value="${jdbc.username}"></property>
+		<property name="password" value="${jdbc.password}"></property>
+		<property name="maxActive" value="3"></property>
+		<property name="maxWait" value="2000"></property>
+	</bean>
+	
+	<!-- 19/06/27 재홍 jdbc 로그 설정 -->
+	<bean id="dataSource"
+		class="net.sf.log4jdbc.Log4jdbcProxyDataSource">
+		
+		<constructor-arg ref="dataSourceSpied" />
+		<property name="logFormatter">
+			<bean class="net.sf.log4jdbc.tools.Log4JdbcCustomFormatter">
+				<property name="loggingType" value="MULTI_LINE" />
+				<property name="sqlPrefix" value="SQL:::" />
+			</bean>
+		</property>
+	</bean>
+	
+	
+	<!-- DataSource 설정-->
+	<context:property-placeholder location="classpath:database.properties"/>
+	<!-- mybatis sqlSessionFactory -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation"
+			value="classpath:SqlMapConfig.xml" />
+		<property name="mapperLocations">
+			<list>
+				<value>classpath*:/mapper/*Mapper.xml</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg ref="sqlSessionFactory"></constructor-arg>
+	</bean>
+	
+	 <!-- 파일 업로드를 위한 bean추가 -->
+  <!-- MultipartResolver -->
+  <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+    <property name="maxUploadSize" value="100000000"/>
+    <property name="maxInMemorySize" value="100000000"/>
+  </bean>
+  
+  <!-- 190722 재홍 -->
+  <bean id="javaMailSenderImpl" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+      <property name="host" value="smtp.gmail.com" />
+      <property name="port" value="587" />
+      <property name="username" value="dtg3431@gmail.com" />
+      <property name="password" value="lpafgorgarhfmwcg" />
+      <property name="javaMailProperties">
+         <props>
+            <prop key="mail.smtp.starttls.enable">true</prop>
+         </props>
+      </property>
+     </bean>
+</beans>

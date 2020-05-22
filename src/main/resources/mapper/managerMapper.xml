@@ -1,0 +1,436 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ManagerDAO">
+	<insert id="insertManager" parameterType="ManagerVO">
+		INSERT INTO MANAGER(
+							MANAGER_ID
+							, MANAGER_PASSWORD
+							, MANAGER_NAME)
+		VALUES	(#{managerId}
+				,#{managerPassword}
+				,#{managerName})
+	</insert>
+	
+	<select id="getManager" resultType="ManagerVO">
+		SELECT 
+				  MANAGER_ID
+				, MANAGER_PASSWORD
+				, MANAGER_NAME
+		FROM MANAGER		
+		WHERE MANAGER_ID = #{managerId}
+	
+	</select>
+	
+	<select id="getManagerList" resultType="ManagerVO">
+		SELECT 
+				  MANAGER_ID
+				, MANAGER_PASSWORD
+				, MANAGER_NAME
+		FROM MANAGER		
+	
+	</select>
+	
+	<select id="managerLogin" resultType="ManagerVO">
+		SELECT 
+				  MANAGER_ID
+				, MANAGER_PASSWORD
+				, MANAGER_NAME
+		FROM MANAGER		
+		WHERE MANAGER_ID = #{managerId} AND MANAGER_PASSWORD = #{managerPassword}
+	
+	</select>
+	
+	<update id="updateManager" parameterType="ManagerVO">
+		UPDATE MANAGER
+		<set>
+			<if test="managerPassword != null"> MANAGER_PASSWORD = #{managerPassword} ,</if>
+			<if test="managerName != null"> MANAGER_NAME = #{managerName} </if>
+		</set>
+		WHERE MANAGER_ID = #{managerId}
+	</update>
+
+	<delete id="deleteManager" parameterType="ManagerVO">
+		DELETE FROM MANAGER
+		<where>
+			<choose>
+				<when test="mngList != null and mngList.length>0">
+					MANAGER_ID in
+					<foreach collection="mngList"
+							 open="(" close=")" separator=","
+							 item="item">
+							 #{item}
+					</foreach>
+				</when>
+				<otherwise>
+					MANAGER_ID = #{managerId}
+				</otherwise>
+			</choose>
+		</where>
+	</delete>
+	
+	<!-- 7/5 재용 추가 -->
+	<select id="getManagerUserAccountView" parameterType="ManagerTakerVO" resultType="ManagerTakerVO">
+		SELECT 	TAKER_ID,
+				TAKER_NAME,
+				TAKER_INFO,
+				TAKER_EDUCATION,
+				TAKER_EMAIL,
+				TAKER_PASSWORD
+		FROM	TAKER
+		WHERE	TAKER_ID = #{takerId}
+	</select>
+	
+	<!-- 기업 목록 조회 -->
+	<select id="getCompanyList" resultType="CompanyVO">
+	SELECT B.* FROM (SELECT A.* , ROWNUM RN FROM(
+		SELECT COMPANY_ID "companyId"
+			,COMPANY_NAME "companyName"
+			,COMPANY_MANAGER "companyManager"
+		FROM COMPANY) A ) B
+		<where>
+			<if test="start != null and start != ''">
+				<if test="end != null and end != ''">
+		 			RN BETWEEN #{start} AND #{end} 
+		 		</if>
+		 	</if>
+		 </where>
+	</select>
+	
+		<!-- 관리자 회사 등록 -->
+		<insert id="managerAccountInsert" parameterType="CompanyVO">
+			INSERT INTO COMPANY (
+								COMPANY_ID
+								, COMPANY_PASSWORD
+								, COMPANY_NAME
+								, BUSINESS_NUMBER
+								, COMPANY_CLASSIFICATION
+								, COMPANY_SECTORS
+								, COMPANY_CREDIT
+								, COMPANY_MANAGER
+								, COMPANY_MANAGER_TELNUM )
+								
+			VALUES ( #{companyId}
+						,#{companyPassword}
+						,#{companyName}
+						,#{businessNumber}
+						,#{companyClassification}
+						,#{companySectors}
+						,#{companyCredit}
+						,#{companyManager}
+						,#{companyManagerTelNum})
+		</insert>
+		
+		<!-- 0708 이승환 추가  // 기업리스트 출력 -->
+	<select id="managerAccountList" resultType="CompanyVO">
+		SELECT B.* FROM (SELECT A.* , ROWNUM RN FROM(
+			SELECT 
+				COMPANY_ID
+				,COMPANY_NAME
+				,COMPANY_CLASSIFICATION
+				,FIND_CODENM(COMPANY_CLASSIFICATION) AS COMPANY_CLASSIFICATION_NAME
+				,COMPANY_MANAGER
+				,COMPANY_MANAGER_TELNUM
+		FROM COMPANY
+		<where>
+			<if test="searchKeyword != null and searchKeyword != ''">
+				${searchCompany} like '%' || #{searchKeyword} || '%'
+			</if>
+		</where>
+		<if test="sort == null or sort == ''">
+			ORDER BY COMPANY_ID DESC
+		</if>
+		<if test="sort != null and sort != ''">
+			ORDER BY ${sort}
+		</if>
+		<![CDATA[
+			) A ) B WHERE RN >=#{start} AND RN <=#{end}
+		]]>
+	</select>
+	
+	<!-- 07.16 이승환 추가  // 매니저가 회사목록 카운팅-->
+	<select id="getManagerCompanyCount" resultType="int">
+		SELECT COUNT(*)
+		FROM COMPANY
+	</select>
+	
+	<!-- 07.16 이승환 추가  // 매니저가 회사목록 카운팅-->
+	<select id="getExamCount" resultType="int">
+		SELECT COUNT(*)
+		FROM EXAM
+	</select>
+	
+		<!-- 매니저, 상담리스트 출력 -->
+	<select id="managerConsultingList" resultType="ConsultingVO">
+		SELECT B.* FROM (SELECT A.* , ROWNUM RN FROM (
+			SELECT CONSULTING_TITLE "title"
+				, CONSULTING_DESIRED_DATE "consultingDesiredDate"
+				, CONSULTING_STATE "consultingState"
+		FROM CONSULTING
+		<where>
+			<if test="searchKeyword != null and searchKeyword != '' ">
+				${searchConsulting} like '%' || #{searchKeyword} || '%'
+			</if>
+		</where>
+		<if test="sort == null or sort=='' ">
+			ORDER BY CONSULTING_ID
+		</if> 
+		<if test="sort != null and sort != ''">
+			ORDER BY ${sort}
+		</if>
+		<![CDATA[
+			) A ) B WHERE RN >= #{start} AND RN <=#{end}
+		]]>
+	</select>
+	
+	<!-- 0708 이승환 추가  // 매니저 기업 수정-->
+	<update id="managerAccountManage" parameterType="CompanyVO">
+		UPDATE COMPANY
+		<set>
+			<if test="companyId != null and companyId != '' ">
+				COMPANY_ID = #{companyId},
+			</if>
+			<if test="companyPassword != null and companyPassword != '' ">
+				COMPANY_PASSWORD = #{companyPassword},
+			</if>
+			<if test="companyName != null and companyName != '' ">
+				COMPANY_NAME = #{companyName},
+			</if>
+			<if test="businessNumber != null and businessNumber != '' ">
+				BUSINESS_NUMBER = #{businessNumber},
+			</if>
+			<if test="companyClassification != null and companyClassification != '' "> 
+				COMPANY_CLASSIFICATION = #{companyClassification},
+			</if>
+			<if test="companySectors != null and companySectors != '' "> 
+				COMPANY_SECTORS = #{companySectors},
+			</if>
+			<if test="companyCredit != null and companyCredit != '' "> 
+				COMPANY_CREDIT = #{companyCredit},
+			</if>
+			<if test="companyManager != null and companyManager != '' ">
+				COMPANY_MANAGER = #{companyManager},
+			</if>
+			<if test="companyManagerTelNum != null and companyManagerTelNum != '' ">
+				COMPANY_MANAGER_TELNUM = #{companyManagerTelNum}
+			</if>
+		</set>
+		WHERE COMPANY_ID = #{companyId}	
+	</update>
+	
+	<!-- 응시자 목록 조회 -->
+	<select id="managerCandidateList" resultType="CandidateVO">
+		SELECT B.* FROM (SELECT A.* , ROWNUM RN FROM (
+			SELECT  TAKER_ID
+					, TAKER_NAME
+					, TAKER_EMAIL
+		FROM TAKER
+		<where>
+			<if test="searchKeyword != null and searchKeyword != ''">
+				${searchKeyword} like '%' || #{searchKeyword} || '%'
+			</if>
+		</where>
+		<if test="sort == null or sort=='' ">
+			ORDER BY TAKER_ID
+		</if>
+		<if test="sort != null and sort != ''">
+			ORDER BY ${sort}
+		</if>
+		<![CDATA[
+			) A ) B WHERE RN >= #{start} AND RN <=#{end}
+		]]>
+	</select>
+	
+	
+	<!-- 응시자 목록 상세조회 -->
+	
+	<!-- 관리자 응시자 추가 -->
+	<insert id="managerUserInsert" parameterType="CandidateVO">
+		INSERT INTO TAKER (TAKER_ID
+							, TAKER_PASSWORD
+							, TAKER_NAME
+							, TAKER_INFO
+							, TAKER_EDUCATION
+							, TAKER_EMAIL
+							, TAKER_PHONENUM)
+		VALUES( #{takerId}
+				 ,#{takerPassword}
+				 ,#{takerName}
+				 ,#{takerInfo}
+				 ,#{takerEducation}
+ 				 ,#{takerEmail}
+ 				 ,#{takerPhoneNum})
+		
+		</insert>
+		
+		<update id="managerUserAccountEdit" parameterType="CandidateVO">
+		UPDATE TAKER
+		<set>
+			<if test="takerPassword != null and takerPassword != '' ">
+				TAKER_PASSWORD = #{takerPassword},
+			</if>
+			<if test="takerName != null and takerName != '' ">
+				TAKER_NAME = #{takerName},
+			</if>
+			<if test="takerInfo != null and takerInfo != '' ">
+				TAKER_INFO = #{takerInfo},
+			</if>
+			<if test="takerEducation != null and takerEducation != '' "> 
+				TAKER_EDUCATION = #{takerEducation},
+			</if>
+			<if test="takerEmail != null and takerEmail != '' "> 
+				TAKER_EMAIL = #{takerEmail},
+			</if>
+			<if test="takerPhoneNum != null and takerPhoneNum != '' "> 
+				TAKER_PHONENUM = #{takerPhoneNum},
+			</if>
+		</set>
+		WHERE TAKER_ID = #{takerId}	
+	</update>
+	
+	<select id="managerGetAllExam" resultType="map">
+		SELECT B.* FROM( SELECT A.*, ROWNUM RN FROM (
+		SELECT 
+		    COMPANY.COMPANY_ID										"companyId"
+		  , EXAM.EXAM_ID											"examId"
+		  , TO_CHAR(EXAM.EXAM_START_TIME, 'YYYY-MM-DD HH24:MI')		"examStartTime"
+		  , TO_CHAR(EXAM.EXAM_END_TIME, 'YYYY-MM-DD HH24:MI')		"examEndTime"
+		  , EXAM.QUESTION_QUANTITY									"questionQuantity"
+		  , EXAM.ESTIMATE_ID										"estimateId"
+		  , EXAM.NUMBER_OF_TIMES									"numberOfTimes"
+		  , EXAM.PASSING_SCORE										"passingScore"
+		  , EXAM.APPLICANTS											"applicants"
+		  , EXAM.EXAM_NAME											"examName"
+		  , EXAM.EXAM_STATUS										"examStatus"
+		  , EXAM.DISCLOSURE_STATUS									"disclosureStatus"
+		  , EXAM.SET_EXAM_STATUS									"setExamStatus"
+		   , EXAM.EXAM_DESCRIPTION_SIMPLE							"examDescriptionSimple"
+		  , EXAM.EXAM_DESCRIPTION_DETAIL							"examDescriptionDetail"
+		FROM EXAM EXAM JOIN ESTIMATE ESTIMATE
+		ON EXAM.ESTIMATE_ID = ESTIMATE.ESTIMATE_ID
+		JOIN COMPANY COMPANY
+		ON COMPANY.COMPANY_ID = ESTIMATE.COMPANY_ID
+		
+		<where>
+		
+			
+			<if test="searchKeyword != null and searchKeyword != ''">
+			<choose>
+				<when test="searchExam == 'EXAM_START_TIME'">
+					TRUNC(EXAM_START_TIME) = #{searchKeyword}
+				</when>
+				<when test="searchExam == 'COMPANY_NAME'">
+					company.company_id in (select company_id
+           			 from company
+            		where (company_name = #{searchKeyword} or company_id = #{searchKeyword})
+            		  and COMPANY_ID = COMPANY.COMPANY_ID )
+				</when>
+			</choose>				
+			</if>
+			<if test="examStatus != null and examStatus != ''">
+				and EXAM_STATUS = #{examStatus}
+			</if>
+			
+		</where>
+		
+			<choose>
+				<when test="sort != null and sort !=''">
+					ORDER BY ${sort}
+				</when>
+				<otherwise>
+					ORDER BY EXAM.EXAM_START_TIME DESC, EXAM.EXAM_ID ASC		
+				</otherwise>
+			</choose>
+			
+		) A ) B
+		<where>
+			<if test = "start != null and start != ''">
+				<if test = "end != null and end != ''">
+					RN BETWEEN #{start} AND #{end}
+				</if>	
+			</if>
+		</where>
+		
+	</select>
+	
+	<select id="managerGetExamForExamVOId" parameterType="ExamVO" resultType="map">
+		SELECT 
+		    COMPANY.COMPANY_ID									"companyId"
+		  , EXAM.EXAM_ID										"examId"
+		  , TO_CHAR(EXAM_START_TIME, 'YYYY-MM-DD HH24:MI') 		"examStartTime"
+		  , TO_CHAR(EXAM_END_TIME, 'YYYY-MM-DD HH24:MI')		"examEndTime"
+		  , EXAM.QUESTION_QUANTITY								"questionQuantity"
+		  , EXAM.ESTIMATE_ID									"estimateId"
+		  , EXAM.NUMBER_OF_TIMES								"numberOfTimes"
+		  , EXAM.PASSING_SCORE									"passingScore"
+		  , EXAM.APPLICANTS										"applicants"
+		  , EXAM.EXAM_NAME										"examName"
+		  , EXAM.EXAM_STATUS									"examStatus"
+		  , EXAM.DISCLOSURE_STATUS								"disclosureStatus"
+		  , EXAM.SET_EXAM_STATUS								"setExamStatus"
+		  , EXAM.EXAM_DESCRIPTION_SIMPLE						"examDescriptionSimple"
+		  , EXAM.EXAM_DESCRIPTION_DETAIL						"examDescriptionDetail"
+		  , COMPANY_EMAIL										"companyEmail"
+		FROM EXAM JOIN ESTIMATE
+		ON EXAM.ESTIMATE_ID = ESTIMATE.ESTIMATE_ID
+		JOIN COMPANY
+		ON COMPANY.COMPANY_ID = ESTIMATE.COMPANY_ID
+		<where>
+			EXAM.EXAM_ID = #{examId}
+		</where>
+		ORDER BY COMPANY.COMPANY_ID DESC, EXAM.EXAM_ID ASC
+	</select>
+	
+	<insert id="managerExamInsert" parameterType="ExamVO">
+		<selectKey keyProperty="examId" resultType="int" order="BEFORE">
+			SELECT NVL(MAX(EXAM_ID),0)+1 FROM EXAM
+		</selectKey>
+		INSERT INTO EXAM (
+							  EXAM_ID
+							, EXAM_START_TIME
+							, EXAM_END_TIME
+							, QUESTION_QUANTITY
+							, ESTIMATE_ID
+							, NUMBER_OF_TIMES
+							, PASSING_SCORE
+							, APPLICANTS
+							, EXAM_NAME
+							, EXAM_STATUS
+							, DISCLOSURE_STATUS
+							, SET_EXAM_STATUS
+							, EXAM_DESCRIPTION_SIMPLE
+							, EXAM_DESCRIPTION_DETAIL	)
+		VALUE ( EXAM_ID_SEQ.NEXTVAL
+				,#{examStartTime}
+				,#{examEndTime}
+				,#{questionQuantity}
+				,#{estimateId}
+				,#{numberOfTimes}
+				,#{passingScore}
+				,#{applicants}
+				,#{examName}
+				,#{examStatus}
+				,#{disclosureStatus}
+				,#{setExamStatus}
+				,#{examDescriptionSimple}
+				,#{examDescriptionDetail} )
+	</insert>
+	
+	<!-- 2019.07.23 성재민 -->
+	<!-- 비공개 시험(E.DISCLOSURE_STATUS = 'O2') 리스트 가져오기 -->
+	<select id="getManagerAllPrivateExamList" resultType="map">
+		SELECT 
+		      C.COMPANY_ID	"companyId"
+		    , COMPANY_NAME	"companyName"
+		    , EXAM_ID		"examId"
+		    , EXAM_NAME		"examName"
+		FROM EXAM E JOIN ESTIMATE ES
+		ON E.ESTIMATE_ID = ES.ESTIMATE_ID
+		JOIN COMPANY C
+		ON ES.COMPANY_ID = C.COMPANY_ID
+		<where>
+			E.DISCLOSURE_STATUS = 'O2'
+		</where>
+		ORDER BY C.COMPANY_ID, EXAM_ID
+	</select>
+	
+</mapper>

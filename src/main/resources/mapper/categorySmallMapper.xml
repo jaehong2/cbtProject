@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="categorySmallDAO">
+	<!-- 2019.07.04 성재민 -->
+	<insert id="insertCategorySmall" parameterType="CategorySmallVO">
+		INSERT INTO CATEGORY_SMALL (	
+				CATEGORY_SMALL_ID  
+				,CATEGORY_MIDDLE_ID
+				,CATEGORY_SMALL_NAME
+			)
+		VALUES (  
+				#{categorySmallId}
+				, #{categoryMiddleId}
+				, #{categorySmallName}
+			)
+	</insert>
+	
+	<!-- 수정 -->
+	<update id="updateCategorySmall" parameterType="CategorySmallVO">
+		UPDATE CATEGORY_SMALL
+		<set>
+			CATEGORY_MIDDLE_ID 		= #{categoryMiddleId},
+			CATEGORY_SMALL_NAME 	= #{categorySmallName}
+		</set>
+		<where>
+			CATEGORY_SMALL_ID = #{categorySmallId}
+		</where>
+	</update>
+	
+	<!-- 삭제  -->
+	<delete id="deleteCategorySmall" parameterType="CategorySmallVO">
+		DELETE FROM CATEGORY_SMALL
+		<where>
+			CATEGORY_SMALL_ID = #{categorySmallId}
+		</where>
+	</delete>
+	
+	<!-- 중분류 ID로 조회  -->
+	<select id="getCategorySmall" resultType="CategorySmallVO">
+		SELECT 
+			CATEGORY_SMALL_ID
+			,CATEGORY_MIDDLE_ID
+			,CATEGORY_SMALL_NAME
+		FROM CATEGORY_SMALL
+		<where>
+			CATEGORY_SMALL_ID = #{categorySmallId}
+		</where>
+	</select>
+	
+	<!-- 대분류 ID로 조회 -->
+	<select id="getCategorySmallList" resultType="CategorySmallVO">
+		SELECT 
+			CATEGORY_SMALL_ID
+			,CATEGORY_MIDDLE_ID
+			,CATEGORY_SMALL_NAME
+		FROM CATEGORY_SMALL
+		<where>
+			CATEGORY_MIDDLE_ID = #{categoryMiddleId}
+		</where>
+	</select>
+	
+	<!-- 모든 조회 -->
+	<select id="getAllCategorySmallList" resultType="CategorySmallVO">
+		SELECT 
+			CATEGORY_SMALL_ID
+			,CATEGORY_MIDDLE_ID
+			,CATEGORY_SMALL_NAME
+		FROM CATEGORY_SMALL
+	</select>
+</mapper>

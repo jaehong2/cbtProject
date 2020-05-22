@@ -1,0 +1,312 @@
+﻿/* Reset */
+* {user-select:none;-moz-user-select:none;-webkit-user-select:none;}
+body, p, h1, h2, h3, h4, h5, h6, ul, ol, li, dl, dt, dd, table, th, td, form, fieldset, legend, input, textarea, button, select {margin:0;padding:0;}
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {display:block;}
+body, input, textarea, select, button, table {font-family:'맑은 고딕', Dotum, "Apple SD Gothic Neo Medium", AppleGothic, sans-serif;font-size:12px;}
+html {-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;}
+html, body {width:100%;height:100%;overflow:hidden;}
+body {position:relative;color:#2a2a2a;font-size:12px;line-height:1.2;user-select:none;-moz-user-select:none;-webkit-user-select:none;}
+img, fieldset {border:0;}
+ul, ol {list-style:none;}
+a {color:#2a2a2a;text-decoration:none;}
+a:hover, a:active, a:focus, a:visited {color:#2a2a2a;text-decoration:none;}
+button {cursor:pointer;}
+:focus {outline:0;}
+.hidden {text-indent:-99999px;font-size:1px;color:transparent;}
+article {display:block;}
+input[type=text], input[type=password], textarea {border-radius:0;-webkit-appearance:none;}
+input[type=text], input[type=password], textarea, .tmMsg, .tmUserId {user-select:text;-moz-user-select:text;-webkit-user-select:text;}
+
+/* Base UI */
+section {position:relative;display:block;width:100%;height:100%;}
+section, div, ul, p {box-sizing:border-box;-moz-box-sizing:border-box;-webkit-box-sizing:border-box;}
+.tmHead {position:absolute;top:0;left:0;z-index:50;width:100%;height:36px;background-color:#4d4d4d;}
+.tmHead h3 {position:absolute;top:10px;left:16px;font-size:14px;font-weight:bold;color:#fff;}
+.tmHead .tmBtnPrevLayer + h3 {left:32px;}
+.tmHead .tmBtnCloseLayer {position:absolute;right:12px;top:10px;display:block;width:17px;height:17px;border:0;background:url("../chatImages/ThemeDefault/btn_close.png") no-repeat 2px 2px;}
+.tmHead .tmBtnPrevLayer {position:absolute;top:10px;left:12px;width:16px;height:16px;border:0;background:url("../chatImages/ThemeDefault/icon_step_prev.png") no-repeat 0 0;background-size:100% 100%;}
+.tmBody {position:relative;top:36px;width:100%;height:100%;padding:0;overflow:hidden;}
+.tmSub {border-top:1px solid #cdcdcd;}
+.tmSub:first-child {border-top:0;}
+.tmSubHead {height:30px;padding:0 16px;border-bottom:1px solid #cdcdcd;font-size:14px;font-weight:bold;line-height:31px;background-color:#f2f2f2;}
+.tmSubBody {padding:20px 16px 30px;}
+.tmBtnArea {width:100%;height:36px;margin-top:30px;}
+.tmBtnArea button {width:100%;height:100%;border:1px solid #ccc;background-color:#e7e7e7;font-weight:bold;font-size:14px;}
+.tmBtnArea button:active {color:#fff;border:1px solid #09c6d2;background-color:#09c6d2;}
+.tmBtnArea button:active span {color:#fff;}
+.tmBtnArea.tmBtnLogin {margin-top:15px;}
+.tmBtnArea.tmBtnLogin button {color:#fff;border:1px solid #0accd6;background-color:#0accd6;}
+.tmBtnArea.tmBtnLogin button:active {background-color:#09bfcc;}
+.tmBtnArea.tmBtnLogin button:active span {color:#fff;}
+.tmBtnArea button .icon_join {display:inline-block;padding-right:10px;background:url("../chatImages/ThemeDefault/icon_join.png") no-repeat right 3px;}
+.tmBtnArea button .icon_save {position:relative;top:2px;display:inline-block;width:12px;height:12px;background:url("../chatImages/ThemeDefault/icon_btn_save.png") no-repeat left top;background-size:100% 100%;vertical-align:top;}
+.tmBtnArea button .icon_quit {display:inline-block;padding-right:8px;background:url("../chatImages/ThemeDefault/icon_quit.png") no-repeat right 3px;}
+.tmInnerBtnArea a,
+.tmInnerBtnArea button {display:block;}
+.tmBtnBasicForm {width:100%;height:43px;line-height:43px;font-weight:bold;text-align:center;vertical-align:middle;border:1px solid #cdcdcd;background-color:#e7e7e7;color:#3ebdc5;}
+.tmBtnSubForm {height:30px;line-height:30px;text-align:center;vertical-align:middle;border:1px solid #b7b7b7;}
+.tmIconBlueArr {display:inline-block;position:relative;top:1px;width:8px;height:10px;background:url("../chatImages/ThemeDefault/icon_blueArr.png") no-repeat left top;background-size:100% 100%;}
+.tmLinkList .tmIconBlueArr {margin-left:7px;}
+.tmText {margin-top:10px;color:#8a8a8a;font-size:11px;}
+.tmFormCheckbox {}
+.tmFormCheckbox li:first-child {margin-top:0;}
+.tmFormCheckbox li {margin-top:3px;}
+.tmFormCheckbox li a {display:block;height:20px;padding-left:28px;line-height:20px;background:url("../chatImages/ThemeDefault/form_checkbox.png") no-repeat left top;}
+.tmFormCheckbox li.active a {background-position:left -22px;}
+.tmFormCheckbox li.disabled a {background-position:left -44px;}
+.tmFormCheckbox input[type=checkbox] {display:none;}
+.tmFormCheckbox.tmNotLogin li a {padding-left:0;background:none;}
+.tmFormRadio li:first-child {margin-top:0;}
+.tmFormRadio li {margin-top:10px;}
+.tmFormRadio li > button {display:block;height:17px;padding-left:24px;line-height:18px;background:url("../chatImages/ThemeDefault/form_radio.png") no-repeat left top;border:none;font-weight:bold;}
+.tmFormRadio li.active > button {background-position:left bottom;}
+.tmFormRadio input[type=radio] {display:none;}
+.tmFormRadio li div {margin-top:7px;}
+.tmFormRadio li div .tmFormInputText {width:100%;}
+.tmFormRadio li div .tmBtnSubForm {float:right;margin-top:-30px;width:44px;}
+.tmFormInputText {background:#fff;padding:7px 5px;width:100%;height:30px;min-height:16px;vertical-align:middle;border:1px solid #cdcdcd;box-sizing:border-box;-moz-box-sizing:border-box;-webkit-box-sizing:border-box;}
+.tmFormSelect {position:relative;}
+.tmFormSelect button {display:block;background:#fff;width:100%;height:28px;line-height:28px;border:1px solid #adada6;}
+.tmFormSelect .tmSelectText {display:block;height:100%;margin:0 28px 0 10px;text-align:left;border-right:1px solid #adada6;}
+.tmFormSelect .tmSelectBullet {position:absolute;top:8px;right:11px;display:block;width:7px;height:12px;background:url("../chatImages/ThemeDefault/form_select.png") no-repeat center center;background-size:100% 100%;}
+.tmFormSelect ul {display:none;position:absolute;top:27px;left:0;background:#fff;width:100%;border:1px solid #adada6;}
+.tmFormSelect li {padding:0 10px;height:28px;line-height:28px;cursor:pointer;}
+.tmFormSelect li.active {font-weight:bold;background-color:#ececec;}
+.tmFieldBox {position:relative;margin-top:20px;}
+.tmFieldBox .form {margin-top:0;}
+.tmFieldBox .form:first-child {margin-bottom:2px;}
+.tmFieldBox .form label {display:block;float:left;width:62px;line-height:30px;font-weight:bold;}
+.tmFieldBox .form p {padding-left:62px;}
+.tmFieldBox .tmLinkList {display:inline-block;margin-left:62px;margin-top:10px;font-weight:bold;}
+
+/* Chat */
+#tmLayerChat {position:absolute;top:0;left:0;width:100%;}
+#tmLayerChat .tmBody {border-left:1px solid #cdcdcd;border-right:1px solid #cdcdcd;}
+#tmLayerMask {display:none;position:absolute;top:0;left:0;width:100%;height:100%;z-index:100;background-color:#000;opacity:0.3;}
+#tmLayerChat .logo {width:80px;height:15px;margin:14px auto 0;}
+#tmLayerChat .logo a {display:block;width:100%;height:100%;background:url("../chatImages/ThemeDefault/donglechat_logo.png") no-repeat left top;}
+#tmUpdateIE {position:relative;z-index:100;background-color:#fbf9ef;height:100%;text-indent:-9999px;font-size:1px;}
+#tmUpdateIE p {position:absolute;top:50%;left:50%;margin-top:-152px;margin-left:-118px;width:236px;height:305px;background:url("../chatImages/ThemeDefault/info_upgrade_large.png") no-repeat left top;}
+#tmUpdateIE .tmBtnUpdateLink {display:block;position:absolute;top:271px;left:64px;width:109px;height:34px;}
+#tmBtnCloseUpdateIE {display:block;position:absolute;right:11px;top:11px;width:17px;height:17px;border:0;background:url("../chatImages/ThemeDefault/btn_close_black.png") no-repeat 2px 2px;}
+#tmPopWrap {display:none;z-index:30;position:absolute;background:#fff;width:80%;max-width:320px;height:auto;border:1px solid #09c6d2;}
+#tmPopWrap h2 {padding:13px 24px;min-height:7px;color:#ffffff;font-size:14px;background:#09c6d2;}
+#tmPopWrap .tmFormRadio {margin:13px 16px 22px;}
+#tmPopWrap .tmBtnArea.tmBtnLogin {margin-top:10px;}
+#tmInfoBar {display:none;z-index:20;position:relative;height:28px;background-color:#f2f2f2;border-bottom:1px solid #dadada;}
+#tmBtnMemberList {height:100%;padding-left:10px;border:0;background-color:transparent;}
+#tmBtnMemberList .icon_person {position:relative;top:2px;display:inline-block;width:13px;height:13px;padding:0;background:url("../chatImages/ThemeDefault/sprite_chat.png") no-repeat left -40px;}
+#tmBtnMemberList strong {display:inline-block;padding-left:4px;color:#30b8ba;font-weight:bold;}
+#tmBtnMemberList span {display:inline-block;color:#30b8ba;font-weight:bold;}
+#tmBtnMemberList .txt_personCount {}
+#tmBtnPreference {position:absolute;right:33px;top:0;width:33px;height:100%;border:0;border-left:1px solid #dadada;background-color:transparent;}
+#tmBtnPreference .icon_preference {display:block;width:15px;height:14px;margin:0 auto;padding:0;background:url("../chatImages/ThemeDefault/sprite_chat.png") no-repeat left top;}
+#tmBtnCloseChat {position:absolute;right:0;top:0;width:33px;height:100%;border:0;border-left:1px solid #dadada;background-color:transparent;}
+#tmBtnCloseChat .icon_quit {display:block;width:18px;height:15px;margin:0 auto;padding:0;background:url("../chatImages/ThemeDefault/sprite_chat.png") no-repeat left -20px;}
+#tmNotification {display:none;z-index:20;position:relative;background:rgba(255,255,255,0.68);}
+#tmNotification h1 {padding:10px 10px;border-bottom:1px solid #d3d3d3;text-align:center;font-weight:bold;font-size:13px;word-wrap:break-word;word-break:break-all;}
+#tmBtnCloseNotification {position:absolute;left:50%;bottom:-8px;width:17px;height:17px;margin-left:-8px;border:0;background-color:transparent;background-image:url("../chatImages/ThemeDefault/sprite_chat.png");background-repeat:no-repeat;}
+#tmBtnCloseNotification.tmBtnOpen {background-position:0 -60px;}
+#tmBtnCloseNotification.tmBtnClose {background-position:0 -80px;}
+#tmMessageList {position:absolute;top:0;left:0;width:100%;height:100%;background:#f3f3f3 url("../chatImages/ThemeDefault/bg_message_list.png") repeat 2px 2px;}
+#tmMessageList .tmInner {width:100%;height:100%;padding-bottom:40px;background:transparent no-repeat center center;overflow-x:hidden;overflow-y:auto;}
+#tmMessageList .tmInner:after {clear:both;display:block;content:"";}
+#tmMessageList .tmInner .jspPane p:first-child {margin-top:80px;}
+#tmMessageList .tmMyMsg {clear:both;position:relative;float:right;max-width:91%;margin:30px 10px 0 0;padding:10px;background-color:#66e3eb;border-radius:8px;box-shadow:0 3px 7px #bbb;}
+#tmMessageList .tmMyMsg + .tmMyMsg {margin-top:15px;}
+#tmMessageList .tmMyMsg .tmMsg {display:inline-block;min-width:13px;}
+#tmMessageList .tmSystemMsg + .tmOtherMsg,
+#tmMessageList .tmSystemMsg + .tmMyMsg {margin-top:10px;}
+#tmMessageList .tmOtherMsg {clear:both;position:relative;float:left;max-width:91%;margin:40px 0 0 10px;padding:10px;background-color:#fff;border-radius:8px;box-shadow:0 3px 7px #bbb;}
+#tmMessageList .tmOtherMsg + .tmOtherMsg {margin-top:28px;}
+#tmMessageList .tmMyMsg + .tmOtherMsg {margin-top:12px;}
+#tmMessageList .tmOtherMsg .tmMsg {display:inline-block;min-width:13px;}
+#tmMessageList .tmOtherMsg .tmUserId {position:absolute;left:0;bottom:-23px;width:100px;font-weight:bold;}
+#tmMessageList .tmSystemMsg {clear:both;position:relative;float:left;width:100%;margin-top:5px;padding:0 5px;text-align:center;}
+#tmMessageList .tmMyMsg + .tmSystemMsg {margin-top:20px;}
+#tmMessageList .tmOtherMsg + .tmSystemMsg {margin-top:30px;}
+#tmMessageList .tmMyMsg,
+#tmMessageList .tmOtherMsg,
+#tmMessageList .tmSystemMsg {user-select:text;-moz-user-select:text;-webkit-user-select:text;}
+#tmMessageList .tmMyMsg .tmArrow {position:absolute;right:10px;bottom:-8px;display:block;width:0;height:0;border-color:transparent #66e3eb transparent transparent;border-style:solid;border-width:20px;}
+#tmMessageList .tmOtherMsg .tmArrow {position:absolute;left:10px;bottom:-8px;display:block;width:0;height:0;border-color:transparent transparent transparent #fff;border-style:solid;border-width:20px;}
+#tmMessageList .tmMsg {z-index:10;position:relative;word-wrap:break-word;word-break:break-all;}
+#tmMessageList .tmMsg a {word-wrap:break-word;word-break:break-all;text-decoration:underline;font-weight:bold;}
+#tmMessageList .chat_open {display:inline-block;width:29px;height:28px;background:url("../chatImages/ThemeDefault/icon_chaton.png") no-repeat left top;vertical-align:top;background-size:29px;}
+#tmMessageList .chat_close {display:inline-block;width:29px;height:28px;background:url("../chatImages/ThemeDefault/icon_chaton.png") no-repeat left bottom;vertical-align:top;background-size:29px;}
+#tmMessageList .tmFontFamily1 {font-family:Dotum !important;}
+#tmMessageList .tmFontFamily2 {font-family:Gulim !important;}
+#tmMessageList .tmFontFamily3 {font-family:"맑은 고딕" !important;}
+#tmMessageList .tmFontFamily4 {font-family:"Nanum Gothic" !important;}
+#tmMessageList .tmFontSize1 {font-size:8pt !important;}
+#tmMessageList .tmFontSize2 {font-size:9pt !important;}
+#tmMessageList .tmFontSize3 {font-size:10pt !important;}
+#tmMessageList .tmFontSize4 {font-size:11pt !important;}
+#tmMessageList .tmFontSize5 {font-size:12pt !important;}
+#tmMessageList .tmFontSize6 {font-size:14pt !important;}
+#tmMessageList .tmFontSize7 {font-size:16pt !important;}
+#tmMessageList .tmFontSize8 {font-size:18pt !important;}
+#tmMessageList .tmFontSize9 {font-size:20pt !important;}
+#tmMessageList .tmFontSize10 {font-size:24pt !important;}
+#tmMessageList .tmFontColor1 {color:#ff0000 !important;}
+#tmMessageList .tmFontColor2 {color:#ffef00 !important;}
+#tmMessageList .tmFontColor3 {color:#65c624 !important;}
+#tmMessageList .tmFontColor4 {color:#00b0a2 !important;}
+#tmMessageList .tmFontColor5 {color:#0075c8 !important;}
+#tmMessageList .tmFontColor6 {color:#3a32c3 !important;}
+#tmMessageList .tmFontColor7 {color:#7820b9 !important;}
+#tmMessageList .tmFontColor8 {color:#000000 !important;}
+#tmMessageList .tmFontColor9 {color:#636363 !important;}
+#tmMessageList .tmFontColor10 {color:#ffffff !important;}
+#tmMessageList .tmFontStyle1 {font-style:normal !important;font-weight:normal !important;}
+#tmMessageList .tmFontStyle2 {font-weight:bold !important;}
+#tmMessageList .tmFontStyle3 {font-style:italic !important;}
+#tmMessageForm {position:absolute;left:0;bottom:24px;width:100%;height:63px;}
+#tmInputMessageWrap {height:100%;margin-right:72px;}
+#tmInputMessage {display:block;width:100%;height:100%;border:0;border-top:1px solid #e0e0e0;resize:none;overflow-y:auto;font-size:14px;}
+#tmInputMessage:disabled {background-color:#fff;}
+#tmSendMessageWrap {height:100%;float:right;width:72px;margin-top:-63px;}
+#tmSendMessage {display:block;width:100%;height:100%;border-top:1px solid #e0e0e0;border-left:1px solid #e0e0e0;border-right:0;border-bottom:0;text-align:center;font-weight:bold;background:url("../chatImages/ThemeDefault/bg_message_send.png") no-repeat left top;background-size:100% 100%;}
+#tmSendMessage:disabled {color:#c3c3c3;}
+#tmCopyright {position:absolute;left:0;bottom:0;width:100%;height:24px;border-top:1px solid #e0e0e0;background-color:#ececec;}
+#tmCopyright p {display:block;width:133px;height:11px;margin:6px auto 0;}
+
+/* Member List */
+#tmLayerMemberList {position:absolute;top:0;left:-245px;z-index:100;width:246px;}
+#tmLayerMemberList .tmHead {background-color:#09c6d2;}
+#tmLayerMemberList ul {padding:20px;}
+#tmLayerMemberList .tmFormCheckbox a {font-family:Dotum;}
+#tmLayerMemberList .tmChatMemberManage {display:block;height:24px;margin-bottom:10px;line-height:24px;font-size:14px;font-weight:bold;}
+#tmLayerMemberList .tmChatMemberManage span {display:inline-block;width:24px;height:24px;margin-right:10px;background:url("../chatImages/ThemeDefault/icon_manage_member.png") no-repeat;background-size:100% 100%;vertical-align:top;}
+#tmLayerMemberList .tmInnerBtnArea {display:none;padding:16px;background-color:#fcfcfc;}
+#tmLayerMemberList .tmBtnBasicForm {margin-bottom:4px;color:#00aeb9;background-color:#e7e7e7;}
+#tmLayerMemberList .tmBtnBasicForm:active {color:#ffffff;border:1px solid #0bb4be;background-position:left bottom;}
+#tmLayerMemberList .tmLinkList {margin-top:10px;color:#2a2a2a;font-weight:bold;}
+#tmLayerMemberList .scroll-pane {overflow-y:auto;border-bottom:1px solid #ccc;background-color:#f4f4f6;}
+
+/* Preference */
+#tmLayerPreference {position:absolute;top:0;right:-320px;width:320px;}
+#tmLayerPreference .tmListView button {display:block;width:100%;height:72px;padding:0 16px;border:none;border-bottom:1px solid #cdcdcd;background-color:#fff;font-size:14px;font-weight:bold;color:#2a2a2a;text-align:left;}
+#tmLayerPreference .tmListView button:first-child {border-top:0;}
+#tmLayerPreference .tmListView button:after {clear:both;display:block;content:"";}
+#tmLayerPreference .tmListView button:hover,
+#tmLayerPreference .tmListView button:active {background-color:#ececec;}
+#tmLayerPreference .tmListView button span {vertical-align:middle;}
+#tmLayerPreference .tmListView button .icon_preference_chat,
+#tmLayerPreference .tmListView button .icon_preference_save,
+#tmLayerPreference .tmListView button .icon_preference_manager {display:inline-block;width:32px;height:32px;background-size:100% 100%;background-color:transparent;background-position:left top;}
+#tmLayerPreference .tmListView button .icon_preference_chat {background-image:url("../chatImages/ThemeDefault/icon_preference_chat.png");}
+#tmLayerPreference .tmListView button .icon_preference_save {background-image:url("../chatImages/ThemeDefault/icon_preference_save.png");}
+#tmLayerPreference .tmListView button .icon_preference_manager {background-image:url("../chatImages/ThemeDefault/icon_preference_manager.png");}
+#tmLayerPreference .tmListView button .icon_next {float:right;display:inline-block;width:16px;height:16px;margin-top:8px;background-size:100% 100%;background-image:url("../chatImages/ThemeDefault/icon_step_next.png");}
+#tmLayerPreferenceChat {z-index:50;display:none;position:absolute;right:0;top:0;width:100%;max-width:320px;background-color:#fff;}
+#tmLayerPreferenceChat .tmBody {overflow-y:auto;}
+#tmLayerPreferenceChat .tmInputBox,
+#tmLayerPreferenceChat .tmText {margin-left:25px;}
+#tmLayerPreferenceChat .tmFormInputText {}
+#tmLayerPreferenceChat .tmListStyle:after {clear:both;display:block;content:"";}
+#tmLayerPreferenceChat .tmListStyle > li {margin-top:10px;}
+#tmLayerPreferenceChat .tmListStyle > li:first-child {margin-top:0px;}
+#tmLayerPreferenceChat .tmListStyle strong {float:left;width:80px;height:28px;line-height:28px;}
+#tmLayerPreferenceChat .tmListStyle .tmFormSelect {margin-left:80px;}
+#tmLayerPreferenceChat .tmColorBar {margin-left:80px;padding-top:5px;}
+#tmLayerPreferenceChat .tmPickColor:after {clear:both;display:block;content:"";height:0px;visibility:hidden;}
+#tmLayerPreferenceChat .tmPickColor li {float:left;width:18px;height:18px;margin:0 0 2px 2px;}
+#tmLayerPreferenceChat .tmPickColor button {position:relative;display:block;width:18px;height:18px;border:none;}
+#tmLayerPreferenceChat .tmPickColor button span {display:block;position:absolute;left:0;top:0;}
+#tmLayerPreferenceChat .tmPickColor button span span {visibility:hidden;width:1px;height:1px;font-size:0;}
+#tmLayerPreferenceChat .tmPickColor button.active,
+#tmLayerPreferenceChat .tmPickColor button:hover {border:1px solid #666666;}
+#tmLayerPreferenceChat .tmPickColor button.active > span,
+#tmLayerPreferenceChat .tmPickColor button:hover > span {width:14px;height:14px;border:1px solid #ffffff;}
+#tmLayerPreferenceChat .tmPickColor .tmBtnColorPicker1 {background-color:#ff0000;}
+#tmLayerPreferenceChat .tmPickColor .tmBtnColorPicker2 {background-color:#ffef00;}
+#tmLayerPreferenceChat .tmPickColor .tmBtnColorPicker3 {background-color:#65c624;}
+#tmLayerPreferenceChat .tmPickColor .tmBtnColorPicker4 {background-color:#00b0a2;}
+#tmLayerPreferenceChat .tmPickColor .tmBtnColorPicker5 {background-color:#0075c8;}
+#tmLayerPreferenceChat .tmPickColor .tmBtnColorPicker6 {background-color:#3a32c3;}
+#tmLayerPreferenceChat .tmPickColor .tmBtnColorPicker7 {background-color:#7820b9;}
+#tmLayerPreferenceChat .tmPickColor .tmBtnColorPicker8 {background-color:#000000;}
+#tmLayerPreferenceChat .tmPickColor .tmBtnColorPicker9 {background-color:#636363;}
+#tmLayerPreferenceChat .tmPickColor .tmBtnColorPicker10 {background-color:#ffffff;border:1px solid #dbdbdb;}
+#tmLayerPreferenceSave {z-index:50;display:none;position:absolute;right:0;top:0;width:100%;max-width:320px;background-color:#fff;}
+#tmLayerPreferenceSave .tmBody {overflow-y:auto;}
+#tmLayerPreferenceSave .tmBtnLogin {margin-top:0;}
+#tmLayerPreferenceSave .tmFormRadio .tmAlertMsg {color:#ff2f2f;}
+#tmLayerPreferenceSave .tmFormRadio .tmFormCheckbox li {font-weight:bold;}
+#tmLayerPreferenceSave .tmInnerBtnArea {padding:20px 20px;}
+#tmLayerPreferenceSave .tmBtnBasicForm {color:#009ba4;}
+#tmLayerPreferenceSave .tmInfoMsg {margin-top:10px;color:#696969;font-size:11px;}
+#tmLayerPreferenceManager {z-index:50;display:none;position:absolute;right:0;top:0;width:100%;max-width:320px;background-color:#fff;}
+#tmLayerPreferenceManager .tmBody {overflow-y:auto;}
+#tmLayerPreferenceManager .tmBtnSubForm {width:63px;color:#009ba4;font-weight:bold;}
+#tmLayerPreferenceManager .tmBtnBasicForm {color:#009ba4;}
+#tmLayerPreferenceManager .tmBtnBasicForm:active {background-position:left bottom;color:#ffffff;border:1px solid #0bb4be;}
+#tmLayerPreferenceManager .tmBtnArea {padding:0 0;}
+#tmLayerPreferenceManager .tmInnerBtnArea {margin-top:12px;padding:20px 20px;border-top:1px solid #cccccc;}
+#tmLayerPreferenceManager #adminForm.tmSub .tmSubBody {padding-top:15px;}
+#tmLayerPreferenceManager #adminForm.tmSub .tmBtnArea {margin-top:15px;}
+
+/**
+* jScrollPane Customize
+*/
+.jspContainer {overflow:hidden;position:relative;}
+.jspPane {position:absolute;}
+.jspVerticalBar {position:absolute;top:0;right:0;width:21px;height:100%;background:red;}
+.jspHorizontalBar {position:absolute;left:0;bottom:0;width:100%;height:16px;background:red;}
+.jspCap {display:none;}
+.jspHorizontalBar .jspCap {float:left;}
+.jspTrack {background:#fafaf7;position:relative;border:1px solid #e5e5e5;}
+.jspDrag {background:#efefef;position:relative;top:0;left:0;cursor:pointer;}
+.jspVerticalBar .jspDrag {background:#efefef url("../chatImages/ThemeDefault/bg_scroll_vert_drag.png") no-repeat center center;}
+.jspDrag:active {background-color:#d7d7d7;position:relative;top:0;left:0;cursor:pointer;}
+.jspHorizontalBar .jspTrack,
+.jspHorizontalBar .jspDrag {float:left;height:100%;}
+.jspArrow {background:#50506d;text-indent:-20000px;display:block;cursor:pointer;padding:0;margin:0;}
+.jspArrow.jspDisabled {cursor:default;background:#80808d;}
+.jspVerticalBar .jspArrow {height:21px;background:#fafaf7;border:1px solid #e5e5e5;}
+.jspVerticalBar .jspArrow:active {background-color:#ededed;}
+.jspHorizontalBar .jspArrow {width:16px;float:left;height:100%;}
+.jspVerticalBar .jspArrow:focus {outline:none;}
+.jspVerticalBar .jspArrowUp {border-bottom:0;background:#fafaf7 url("../chatImages/ThemeDefault/bg_scroll_arrow_up.png") no-repeat center center;}
+.jspVerticalBar .jspArrowDown {border-top:0;background:#fafaf7 url("../chatImages/ThemeDefault/bg_scroll_arrow_down.png") no-repeat center center;}
+.jspCorner {background:#eeeef4;float:left;height:100%;}
+
+/* 320px 미만의 스크린 */
+@media screen and (max-width:319px) {
+	/* Base UI */
+	.tmSubBody {padding:10px;}
+	.tmFormRadio li div .tmBtnSubForm {float:none;margin-top:1px;width:100%;}
+	.tmFormRadio li div .form p {padding-right:0;}
+	.tmBtnBasicForm {height:30px;line-height:30px;}
+	.tmFieldBox {margin-top:0;}
+	.tmFieldBox .form {padding-right:0;}
+	.tmFieldBox .form label {float:none;display:block;width:auto;padding:5px 0 3px;line-height:initial;}
+	.tmFieldBox .form p {padding-left:0;}
+	.tmFieldBox .tmLinkList {clear:both;display:block;margin-left:0;}
+	
+	/* Member List */
+	#tmLayerMemberList {width:100%;}
+	
+	/* Chat */
+	#tmMessageList .tmMyMsg,
+	#tmMessageList .tmOtherMsg {max-width:85%;}
+	#tmMessageList .tmInner {background-size:116px 76px;}
+	#tmMessageForm {height:30px;}
+	#tmInputMessageWrap {margin-right:30px;}
+	#tmSendMessageWrap {width:30px;margin-top:-30px;background-size:100% 100%;}
+	#tmUpdateIE p {margin-left:-68px;margin-top:-96px;width:137px;height:192px;background-image:url("../chatImages/ThemeDefault/info_upgrade_small.png");}
+	#tmUpdateIE .tmBtnUpdateLink {top:158px;left:14px;}
+	#tmPopWrap {width:100%;height:100%;border:0;}
+	#tmPopWrap h2 {text-align:center;}
+	#tmPopWrap .tmFormRadio {margin:15px 10px;}
+	#tmInputName {text-align:center;}
+	
+	/* Preference */
+	#tmLayerPreference {width:100%;}
+	#tmLayerPreference .tmListView button {padding:0 10px;}
+	#tmLayerPreferenceSave .tmInfoMsg {padding:0 15px;}
+	#tmLayerPreferenceChat .tmListStyle strong {width:35px;}
+	#tmLayerPreferenceChat .tmListStyle .tmFormSelect {margin-left:35px;}
+	#tmLayerPreferenceChat .tmColorBar {margin-left:35px;padding-top:5px;}
+}

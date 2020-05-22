@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<webflow-project-description>
+	<version>1</version>
+	<pluginVersion><![CDATA[3.9.9.201906180643-RELEASE]]></pluginVersion>
+	<configs>
+		<config>
+			<file>src/main/webapp/startbootstrapCreative/images.xml</file>
+			<name><![CDATA[images]]></name>
+		</config>
+	</configs>
+</webflow-project-description>

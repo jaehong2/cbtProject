@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="privateExamDAO">
+	<!-- 2019.07.23 성재민 -->
+	<!-- 비공개 시험 관련 sql 작성 -->
+	<insert id="insertPrivateExam">
+		INSERT INTO PRIVATE_EXAM(
+				PRIVATE_EXAM_ID
+			,	EXAM_ID
+			,	TAKER_ID
+		) 
+		VALUES (
+				PRIVATE_EXAM_ID_SEQ.NEXTVAL
+			, 	#{examId}
+			, 	#{takerId}
+		)
+	</insert>
+	
+	<!-- 2019.07.23 성재민 -->
+	<!-- 비공개 시험 삭제 응시자 id 로 -->
+	<delete id="deletePrivateExam" parameterType="PrivateExamVO">
+		DELETE FROM PRIVATE_EXAM
+		<where>
+			TAKER_ID = #{takerId}
+		</where>
+	</delete>
+	
+	<!-- 2019.07.23 성재민 -->
+	<!-- 비공개 시험 삭제 -->
+	<delete id="deletePrivateExamForExamId" parameterType="PrivateExamVO">
+		DELETE FROM PRIVATE_EXAM
+		<where>
+			EXAM_ID = #{examId}
+		</where>
+	</delete>
+	
+	<!-- 2019.07.25 성재민 -->
+	<!-- 시험 id 로 검색 -->
+	<select id="getPrivateExamListForExamId" resultType="PrivateExamVO">
+		SELECT 
+				PRIVATE_EXAM_ID
+			,	EXAM_ID
+			,	TAKER_ID
+		FROM PRIVATE_EXAM
+		<where>
+			EXAM_ID = #{examId}
+		</where>
+	</select>
+	
+	<!-- 2019.07.25 성재민 -->
+	<!-- 응시자 id 로 검색 -->
+	<select id="getPrivateExamListForTakerId" resultType="PrivateExamVO">
+		SELECT 
+				PRIVATE_EXAM_ID
+			,	EXAM_ID
+			,	TAKER_ID
+		FROM PRIVATE_EXAM
+		<where>
+			TAKER_ID = #{takerId}
+		</where>
+	</select>
+	
+	<select id="getAllPrivateExamList" resultType="PrivateExamVO">
+		SELECT 
+				PRIVATE_EXAM_ID
+			,	EXAM_ID
+			,	TAKER_ID
+		FROM PRIVATE_EXAM
+	</select>
+</mapper>
